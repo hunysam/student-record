@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: 'Pretendard', sans-serif; background-color: #f5f7fa; margin: 0; padding: 0; color: #333; }
+    .top-bar { position: sticky; top: 0; z-index: 1000; background-color: #ffffff; height: 60px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .back-btn { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 24px; color: #2c3e50; cursor: pointer; padding: 5px; display: none; }
+    .top-title { font-size: 18px; font-weight: bold; margin: 0; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; padding-bottom: 50px; }
+    .page { display: none; animation: fadeIn 0.3s; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    .menu-item { background: #ffffff; border-radius: 16px; padding: 25px 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; transition: 0.2s; }
+    .menu-item:nth-child(5) { grid-column: span 2; } 
+    .menu-icon { font-size: 40px; color: #4A90E2; margin-bottom: 12px; display: block; }
+    .menu-title { font-size: 15px; font-weight: 700; color: #4a4a4a; }
+    .section-card { background: #ffffff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 20px; }
+    h2 { font-size: 18px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 15px; }
+    p.desc { font-size: 13px; color: #7f8c8d; margin-bottom: 15px; }
+    input, select { width: 100%; padding: 14px; margin-bottom: 12px; border: 1px solid #e1e5eb; border-radius: 10px; font-size: 15px; box-sizing: border-box; background: #fafbfc; }
+    input:disabled, select:disabled { background: #e9ecef; color: #6c757d; cursor: not-allowed; }
+    .input-row { display: flex; gap: 10px; } 
+    .input-row input, .input-row select { flex: 1; margin-bottom: 12px; }
+    .btn-primary { width: 100%; background: #4A90E2; color: white; padding: 15px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    .btn-secondary { background: #95a5a6; color: white; padding: 15px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top:10px; width: 100%; }
+    .list-item { background: #fdfdfd; border: 1px solid #eee; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .btn-action { color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight:bold; }
+    .btn-edit { background: #f39c12; margin-right: 5px; }
+    .btn-delete { background: #ff4757; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top:10px; }
+    th { background: #f1f3f5; padding: 12px; border-radius: 8px 8px 0 0; }
+    td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; }
+    .history-row td { background: #f8f9fa; padding: 15px 10px; text-align: left; }
+    #login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; box-sizing: border-box; }
+    #login-box { width: 100%; max-width: 350px; text-align: center; }
+    .edit-alert { display: none; background: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; font-weight: bold; text-align: center; }
+    .chart-container { position: relative; height: 250px; width: 100%; margin-top: 20px; }
+    .level-badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; color: white; display: inline-block; }
+    
+    .creator-mark {
+      position: fixed;
+      bottom: 8px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      color: #b2bec3;
+      z-index: 9999;
+      pointer-events: none;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="creator-mark">ⓒ Created by hunysam</div>
+
+<div id="login-screen">
+  <div id="login-box" class="section-card">
+    <span class="material-icons" style="font-size:48px; color:#4A90E2; margin-bottom:10px;">lock</span>
+    <h2 style="border:none;">교사 인증</h2>
+    <input type="password" id="adminPwd" placeholder="비밀번호" onkeypress="if(event.key==='Enter') login()">
+    <button id="loginBtn" class="btn-primary" onclick="login()">접속하기</button>
+  </div>
+</div>
+
+<div id="main-app" style="display:none;">
+  <div class="top-bar">
+    <button id="backBtn" class="back-btn" onclick="changePage('page-home', '학생운동관리 홈')"><span class="material-icons">arrow_back_ios_new</span></button>
+    <h1 id="topTitle" class="top-title">학생운동관리 홈</h1>
+  </div>
+
+  <div class="container">
+    <div id="page-home" class="page active">
+      <div class="menu-grid">
+        <div class="menu-item" onclick="changePage('page-sport', '운동종목 관리')"><span class="material-icons menu-icon">fitness_center</span><span class="menu-title">운동종목관리</span></div>
+        <div class="menu-item" onclick="changePage('page-student', '학생 데이터 관리')"><span class="material-icons menu-icon">group_add</span><span class="menu-title">학생관리</span></div>
+        <div class="menu-item" onclick="changePage('page-view-student', '학생별 결과 조회')"><span class="material-icons menu-icon">person_search</span><span class="menu-title">학생별 조회</span></div>
+        <div class="menu-item" onclick="changePage('page-view-sport', '종목별 결과 조회')"><span class="material-icons menu-icon">bar_chart</span><span class="menu-title">종목별 조회</span></div>
+        <div class="menu-item" onclick="changePage('page-input', '오늘의 결과 입력')"><span class="material-icons menu-icon">edit_document</span><span class="menu-title">운동결과 입력</span></div>
+      </div>
+    </div>
+
+    <div id="page-sport" class="page">
+      <div class="section-card">
+        <h2>새로운 종목 추가</h2>
+        <input type="text" id="newSport" placeholder="종목명 (예: 줄넘기)" onkeypress="if(event.key==='Enter') addNewSport()">
+        <div class="input-row">
+          <input type="number" id="v1" placeholder="초보 기준" onkeypress="if(event.key==='Enter') addNewSport()">
+          <input type="number" id="v2" placeholder="고수 기준" onkeypress="if(event.key==='Enter') addNewSport()">
+          <input type="number" id="v3" placeholder="지존 기준" onkeypress="if(event.key==='Enter') addNewSport()">
+        </div>
+        <button class="btn-primary" onclick="addNewSport()">등록하기</button>
+      </div>
+      <div id="sportListArea"></div>
+    </div>
+    
+    <div id="page-student" class="page">
+      <div class="section-card">
+        <h2>학생 정보 입력 / 수정</h2>
+        <div id="editAlert" class="edit-alert"><span class="material-icons" style="vertical-align: middle; font-size: 18px;">edit</span> 현재 학생 정보를 수정 중입니다.</div>
+
+        <div class="input-row">
+          <select id="s_grade">
+            <option value="">학년 선택</option><option value="1">1학년</option><option value="2">2학년</option><option value="3">3학년</option><option value="4">4학년</option><option value="5">5학년</option><option value="6">6학년</option>
+          </select>
+          <input type="number" id="s_class" placeholder="반" min="1">
+          <input type="number" id="s_num" placeholder="번호" min="1">
+        </div>
+        <input type="text" id="s_name" placeholder="학생 이름">
+        <input type="password" id="s_pin" placeholder="학생용 비밀번호(PIN) 설정" style="border-color:#e67e22;" onkeypress="if(event.key==='Enter') submitStudent()">
+        
+        <p style="margin: 15px 0 5px 0; font-size: 14px; font-weight: bold;">희망 운동종목</p>
+        <select id="s_sport1" class="sport-select" onchange="updateSportDropdownVisibility()"><option value="">선택안함</option></select>
+        <select id="s_sport2" class="sport-select" onchange="updateSportDropdownVisibility()"><option value="">선택안함</option></select>
+        <select id="s_sport3" class="sport-select" onchange="updateSportDropdownVisibility()"><option value="">선택안함</option></select>
+        <select id="s_sport4" class="sport-select" onchange="updateSportDropdownVisibility()"><option value="">선택안함</option></select>
+        <select id="s_sport5" class="sport-select" onchange="updateSportDropdownVisibility()"><option value="">선택안함</option></select>
+        
+        <button id="btnSubmitStudent" class="btn-primary" onclick="submitStudent()" style="background:#2ecc71;">학생 신규 저장하기</button>
+        <button id="btnCancelEdit" class="btn-secondary" onclick="cancelEditMode()" style="display:none;">수정 취소하기</button>
+      </div>
+      <div id="studentListArea"></div>
+    </div>
+
+    <div id="page-input" class="page">
+      <div class="section-card">
+        <h2>결과 입력하기</h2>
+        <input type="text" id="searchStudentName" placeholder="학생 이름 검색" onkeypress="if(event.key==='Enter') searchStudent()">
+        <button class="btn-primary" onclick="searchStudent()">학생 검색</button>
+      </div>
+      <div id="studentSearchResult"></div>
+    </div>
+    
+    <div id="page-view-sport" class="page">
+      <div class="section-card">
+        <h2>종목별 랭킹 조회</h2>
+        <select id="searchSportSelect" class="sport-select" onchange="viewSportRecords()"><option value="">종목 선택</option></select>
+        <button class="btn-primary" onclick="viewSportRecords()" style="background:#e67e22;">기록 조회</button>
+      </div>
+      <div id="viewSportResult"></div>
+    </div>
+    
+    <div id="page-view-student" class="page">
+      <div class="section-card">
+        <h2>교사용 개별 기록 조회</h2>
+        <input type="text" id="viewStudentName" placeholder="학생 이름 검색" onkeypress="if(event.key==='Enter') viewStudentRecords()">
+        <button class="btn-primary" onclick="viewStudentRecords()" style="background:#8e44ad;">기록 조회</button>
+      </div>
+      <div id="viewStudentResult"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // =========================================================================
+  // 💡 [핵심] Vercel과 Google Script를 연결해주는 프록시 (마법의 통로)
+  // 선생님의 기존 함수들을 단 한 줄도 수정하지 않고 그대로 쓸 수 있게 해줍니다!
+  // =========================================================================
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyut1CvhMzwvgeIXZ1ZpZoLOrFrndZCDJ5dXehA8WA0VZ-VUdxHn_AYPy7pzDn1DupE/exec";
+  
+  window.google = {
+    script: {
+      run: {
+        withSuccessHandler: function(callback) {
+          return new Proxy({}, {
+            get: function(target, methodName) {
+              return function(...args) {
+                fetch(SCRIPT_URL, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                  body: JSON.stringify({ action: methodName, args: args })
+                })
+                .then(res => res.json())
+                .then(res => {
+                  if (res.success) callback(res.data);
+                  else { console.error(res.error); alert("서버 오류: " + res.error); }
+                })
+                .catch(err => { console.error(err); alert("통신 중 오류가 발생했습니다."); });
+              };
+            }
+          });
+        }
+      }
+    }
+  };
+  // =========================================================================
+
+  let isEditMode = false;
+  let currentEditTarget = null;
+  let studentCharts = [];
+
+  const LEVEL_COLORS = { "초보": "#2ecc71", "고수": "#f39c12", "지존": "#e74c3c" };
+
+  function login() {
+    const pwd = document.getElementById('adminPwd').value;
+    if(!pwd) return;
+    google.script.run.withSuccessHandler(isValid => {
+      if(isValid) { 
+        document.getElementById('login-screen').style.display = 'none'; 
+        document.getElementById('main-app').style.display = 'block'; 
+        loadSportOptions(); 
+      } else { 
+        alert("❌ 비밀번호가 틀렸습니다!"); 
+        document.getElementById('adminPwd').value = ''; 
+      }
+    }).checkAdminPassword(pwd);
+  }
+
+  function changePage(targetPageId, pageTitle) {
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    document.getElementById(targetPageId).classList.add('active');
+    document.getElementById('topTitle').innerText = pageTitle;
+    document.getElementById('backBtn').style.display = (targetPageId === 'page-home') ? 'none' : 'block';
+    
+    if (targetPageId === 'page-sport') refreshSports(); 
+    if (targetPageId === 'page-student' || targetPageId === 'page-view-sport') loadSportOptions(); 
+    if (targetPageId === 'page-student') { refreshStudents(); cancelEditMode(); } 
+    window.scrollTo(0, 0);
+  }
+
+  function loadSportOptions() {
+    google.script.run.withSuccessHandler(sports => {
+      const optionsHtml = '<option value="">선택안함</option>' + sports.map(sport => `<option value="${sport}">${sport}</option>`).join('');
+      document.querySelectorAll('.sport-select').forEach(select => { 
+        const currentVal = select.value;
+        select.innerHTML = optionsHtml; 
+        select.value = currentVal;
+      });
+      updateSportDropdownVisibility();
+    }).getSportNames();
+  }
+
+  function updateSportDropdownVisibility() {
+    const selects = [1, 2, 3, 4, 5].map(i => document.getElementById(`s_sport${i}`));
+    const selectedSports = new Set(selects.map(s => s.value).filter(val => val !== ""));
+    selects.forEach(select => {
+      Array.from(select.options).forEach(option => {
+        if (option.value === "") return; 
+        const isSelectedByOther = selectedSports.has(option.value) && select.value !== option.value;
+        option.hidden = isSelectedByOther; 
+        option.disabled = isSelectedByOther;
+      });
+    });
+  }
+
+  function addNewSport() { 
+    const name = document.getElementById('newSport').value; 
+    const v1 = document.getElementById('v1').value, v2 = document.getElementById('v2').value, v3 = document.getElementById('v3').value; 
+    if(!name) return; 
+    google.script.run.withSuccessHandler(msg => { 
+      alert(msg); 
+      ['newSport','v1','v2','v3'].forEach(id => document.getElementById(id).value = ''); 
+      refreshSports(); 
+    }).addSport(name, v1, v2, v3); 
+  }
+
+  function refreshSports() { 
+    google.script.run.withSuccessHandler(sports => { 
+      const html = sports.map(sport => `<div class="list-item"><div><strong>${sport.name}</strong><br><span style="font-size:13px;">초보:${sport.v1} | 고수:${sport.v2} | 지존:${sport.v3}</span></div><button class="btn-action btn-delete" onclick="removeSport('${sport.name}')">삭제</button></div>`).join('');
+      document.getElementById('sportListArea').innerHTML = html; 
+    }).getSportList(); 
+  }
+  
+  function removeSport(name) { 
+    if(confirm("삭제할까요?")) google.script.run.withSuccessHandler(msg => { alert(msg); refreshSports(); }).deleteSport(name); 
+  }
+
+  function submitStudent() {
+    const info = {
+      grade: document.getElementById('s_grade').value, class: document.getElementById('s_class').value,
+      num: document.getElementById('s_num').value, name: document.getElementById('s_name').value,
+      pin: document.getElementById('s_pin').value,
+      sport1: document.getElementById('s_sport1').value, sport2: document.getElementById('s_sport2').value,
+      sport3: document.getElementById('s_sport3').value, sport4: document.getElementById('s_sport4').value, sport5: document.getElementById('s_sport5').value
+    };
+
+    if(!info.grade || !info.class || !info.num || !info.name) { alert("인적사항을 모두 입력/선택해주세요!"); return; }
+    if (parseInt(info.class, 10) < 1 || parseInt(info.num, 10) < 1) { alert("❌ 반과 번호는 1 이상의 숫자만 입력해 주세요."); return; }
+
+    const selectedSports = [info.sport1, info.sport2, info.sport3, info.sport4, info.sport5].filter(s => s !== "");
+    if (selectedSports.length !== new Set(selectedSports).size) { alert("❌ 중복된 종목이 있습니다."); return; }
+
+    const btn = document.getElementById('btnSubmitStudent');
+    btn.innerText = "처리 중..."; btn.disabled = true;
+
+    const onSuccess = msg => { alert(msg); cancelEditMode(); refreshStudents(); };
+    if (isEditMode) {
+      google.script.run.withSuccessHandler(onSuccess).updateStudentData(currentEditTarget, info);
+    } else {
+      google.script.run.withSuccessHandler(onSuccess).saveStudent(info);
+    }
+  }
+
+  function refreshStudents() {
+    google.script.run.withSuccessHandler(students => {
+      let headerHtml = '<h3 style="margin-top:10px;">등록된 학생 목록</h3>';
+      if(students.length === 0) { 
+        document.getElementById('studentListArea').innerHTML = headerHtml + '<p style="color:#777;">등록된 학생이 없습니다.</p>'; 
+        return; 
+      }
+      const listHtml = students.map(s => {
+        const sportsSafeStr = s.sports.map(sp => sp || "").join(",");
+        const pinSafeStr = s.pin || "";
+        return `<div class="list-item"><div><strong>${s.name}</strong> <span style="font-size:13px; color:#7f8c8d;">(${s.grade}-${s.classNum}-${s.num})</span></div><div><button class="btn-action btn-edit" onclick="startEditMode('${s.grade}', '${s.classNum}', '${s.num}', '${s.name}', '${sportsSafeStr}', '${pinSafeStr}')">수정</button> <button class="btn-action btn-delete" onclick="removeStudent('${s.grade}', '${s.classNum}', '${s.num}', '${s.name}')">삭제</button></div></div>`;
+      }).join('');
+      document.getElementById('studentListArea').innerHTML = headerHtml + listHtml;
+    }).getStudentList();
+  }
+
+  function startEditMode(g, c, n, name, sportsStr, pin) {
+    isEditMode = true; currentEditTarget = { grade: g, classNum: c, num: n, name: name }; 
+    document.getElementById('editAlert').style.display = 'block';
+    const btnSubmit = document.getElementById('btnSubmitStudent');
+    btnSubmit.innerText = "학생 정보 업데이트 (수정)"; btnSubmit.style.background = "#f39c12"; 
+    document.getElementById('btnCancelEdit').style.display = 'block';
+
+    const inputs = { 's_grade': g, 's_class': c, 's_num': n, 's_name': name, 's_pin': pin };
+    for (let id in inputs) { 
+      const el = document.getElementById(id);
+      el.value = inputs[id]; 
+      if(id !== 's_pin') el.disabled = true; 
+    }
+
+    const sports = sportsStr.split(',');
+    for(let i=1; i<=5; i++) { document.getElementById(`s_sport${i}`).value = sports[i-1] || ""; }
+    updateSportDropdownVisibility(); window.scrollTo(0, 0); 
+  }
+
+  function cancelEditMode() {
+    isEditMode = false; currentEditTarget = null;
+    document.getElementById('editAlert').style.display = 'none';
+    const btnSubmit = document.getElementById('btnSubmitStudent'); 
+    btnSubmit.innerText = "학생 신규 저장하기"; btnSubmit.style.background = "#2ecc71"; btnSubmit.disabled = false;
+    document.getElementById('btnCancelEdit').style.display = 'none';
+    ['s_grade','s_class','s_num','s_name','s_pin'].forEach(id => { 
+      const el = document.getElementById(id); el.value = ''; el.disabled = false; 
+    });
+    document.querySelectorAll('.sport-select').forEach(sel => sel.value = ''); updateSportDropdownVisibility();
+  }
+
+  function removeStudent(g, c, n, name) { 
+    if(confirm(`${name} 학생을 삭제할까요?`)) google.script.run.withSuccessHandler(msg => { alert(msg); refreshStudents(); }).deleteStudent(g, c, n, name); 
+  }
+
+  function searchStudent() {
+    const name = document.getElementById('searchStudentName').value; if (!name) return;
+    document.getElementById('studentSearchResult').innerHTML = "검색 중...";
+    google.script.run.withSuccessHandler(results => {
+      const html = results.map((student, index) => {
+        let card = `<div class="section-card"><h3>${student.grade}-${student.classNum}-${student.num} ${student.name}</h3>`;
+        if (student.sports.length === 0) return card + `<p>신청 종목이 없습니다.</p></div>`;
+        const inputsHtml = student.sports.map(sport => `<div style="flex:1; background:#f5f7fa; padding:10px; border-radius:8px; text-align:center;"><strong style="font-size:14px;">${sport}</strong><br><input type="number" id="record_${index}_${sport}" placeholder="기록" style="margin-top:8px;" onkeypress="if(event.key==='Enter') document.getElementById('btnSave_${index}').click()"></div>`).join('');
+        return card + `<div style="display:flex; flex-wrap:wrap; gap:10px;">${inputsHtml}</div><button id="btnSave_${index}" class="btn-primary" style="margin-top:15px; background:#27ae60;" onclick="submitDailyRecord(${index}, '${student.grade}', '${student.classNum}', '${student.num}', '${student.name}', '${student.sports.join(',')}')">결과 저장</button></div>`;
+      }).join('');
+      document.getElementById('studentSearchResult').innerHTML = html;
+    }).searchStudentByName(name);
+  }
+  
+  function submitDailyRecord(index, grade, classNum, num, name, sportsStr) {
+    const sports = sportsStr.split(','); const records = [];
+    sports.forEach(sport => { 
+      const inputVal = document.getElementById(`record_${index}_${sport}`).value; 
+      if (inputVal) records.push({ sport: sport, value: inputVal }); 
+    });
+    if (records.length === 0) return;
+    google.script.run.withSuccessHandler(msg => { 
+      alert(msg); sports.forEach(sport => document.getElementById(`record_${index}_${sport}`).value = ''); 
+    }).saveDailyRecord({ grade: grade, classNum: classNum, num: num, name: name }, records);
+  }
+
+  function viewStudentRecords() {
+    const name = document.getElementById('viewStudentName').value; if (!name) return;
+    document.getElementById('viewStudentResult').innerHTML = "데이터를 불러오고 그래프를 그리는 중...";
+    
+    studentCharts.forEach(chart => chart.destroy()); studentCharts = [];
+
+    google.script.run.withSuccessHandler(response => {
+      if(response.error) { document.getElementById('viewStudentResult').innerHTML = `<p style="color:red; font-weight:bold; text-align:center;">${response.error}</p>`; return; }
+      
+      const html = response.map((data, index) => {
+        let cardHtml = `<div class="section-card"><h3>👤 ${data.studentInfo || data.name}</h3>`;
+        
+        if(!data.results || data.results.length === 0) {
+          return cardHtml + `<p>입력된 종목이 없습니다.</p></div>`;
+        }
+        
+        const tableRows = data.results.map(r => {
+          const bgColor = LEVEL_COLORS[r.level] || "#95a5a6"; 
+          return `<tr><td><strong>${r.sport}</strong></td><td style="font-weight:bold;">${r.total}</td><td><span class="level-badge" style="background-color:${bgColor};">${r.level || '-'}</span></td></tr>`;
+        }).join('');
+
+        cardHtml += `<table><tr><th>종목</th><th>누적 기록</th><th>달성 단계</th></tr>${tableRows}</table>`;
+        
+        const chartLabels = data.recentHistory?.labels || data.chartLabels || data.labels || data.history?.labels;
+        const chartDatasets = data.recentHistory?.datasets || data.chartDatasets || data.datasets || data.history?.datasets;
+
+        if(chartLabels?.length > 0 && chartDatasets) {
+          cardHtml += `<h4 style="margin-top: 25px; margin-bottom: 5px; font-size: 15px; color: #555;">📈 최근 7일 운동 흐름</h4><div class="chart-container"><canvas id="recentChart_${index}"></canvas></div>`;
+        } else {
+          cardHtml += `<p style="color:#999; font-size:13px; margin-top:15px; text-align:center;">(최근 7일간 입력된 세부 기록이 없습니다.)</p>`;
+        }
+        return cardHtml + `</div>`;
+      }).join('');
+      
+      document.getElementById('viewStudentResult').innerHTML = html;
+
+      response.forEach((data, index) => {
+        const chartLabels = data.recentHistory?.labels || data.chartLabels || data.labels || data.history?.labels;
+        const chartDatasets = data.recentHistory?.datasets || data.chartDatasets || data.datasets || data.history?.datasets;
+        if(chartLabels?.length > 0 && chartDatasets) drawChart(`recentChart_${index}`, chartLabels, chartDatasets);
+      });
+    }).getStudentRecordsAndLevels(name, "");
+  }
+
+  function drawChart(canvasId, labels, datasets) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: datasets.map(ds => ({ label: ds.sport || ds.label, data: ds.data, tension: 0.3, borderWidth: 2, pointRadius: 4, pointBackgroundColor: '#fff' }))
+      },
+      options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { position: 'bottom' } } }
+    });
+    studentCharts.push(chart);
+  }
+
+  function viewSportRecords() {
+    const sportName = document.getElementById('searchSportSelect').value; if(!sportName) return;
+    document.getElementById('viewSportResult').innerHTML = "불러오는 중...";
+    
+    google.script.run.withSuccessHandler(response => {
+      if(response.error) { document.getElementById('viewSportResult').innerHTML = response.error; return; }
+      
+      const tableRows = response.map(s => {
+        const bgColor = LEVEL_COLORS[s.level] || "#95a5a6";
+        return `<tr><td style="text-align:left;">${s.name}</td><td>${s.total}</td><td><span class="level-badge" style="background-color:${bgColor};">${s.level}</span></td></tr>`;
+      }).join('');
+      document.getElementById('viewSportResult').innerHTML = `<div class="section-card"><h3>🏆 '${sportName}' 결과</h3><table><tr><th>학생</th><th>누적</th><th>단계</th></tr>${tableRows}</table></div>`;
+    }).getRecordsBySport(sportName);
+  }
+</script>
+</body>
+</html>
