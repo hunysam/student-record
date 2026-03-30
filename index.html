@@ -70,6 +70,41 @@
 <div class="creator-mark">ⓒ Created by hunysam</div>
 
 <script>
+// =========================================================================
+  // 💡 Vercel <-> Google Script 연결 통로 (학생용)
+  // =========================================================================
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyut1CvhMzwvgeIXZ1ZpZoLOrFrndZCDJ5dXehA8WA0VZ-VUdxHn_AYPy7pzDn1DupE/exec";
+  
+  window.google = {
+    script: {
+      run: {
+        withSuccessHandler: function(callback) {
+          return new Proxy({}, {
+            get: function(target, methodName) {
+              return function(...args) {
+                fetch(SCRIPT_URL, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                  body: JSON.stringify({ action: methodName, args: args })
+                })
+                .then(res => res.json())
+                .then(res => {
+                  if (res.success) callback(res.data);
+                  else { console.error(res.error); alert("오류: " + res.error); }
+                })
+                .catch(err => { 
+                  console.error(err); 
+                  alert("통신 오류! 잠시 후 다시 시도해주세요."); 
+                });
+              };
+            }
+          });
+        }
+      }
+    }
+  };
+  // =========================================================================
+  
   // 💡 구글 스크립트 배포 주소 (선생님이 복사해주신 그 주소!)
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyut1CvhMzwvgeIXZ1ZpZoLOrFrndZCDJ5dXehA8WA0VZ-VUdxHn_AYPy7pzDn1DupE/exec";
 
