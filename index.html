@@ -90,14 +90,27 @@
     els.resultArea.innerHTML = '';
     els.loading.style.display = 'block';
 
-    try {
-      // 💡 구글 서버가 이해할 수 있는 방식(GET)으로 주소에 파라미터 묶어서 전송!
-      const requestUrl = `${SCRIPT_URL}?action=searchStudent&name=${encodeURIComponent(name)}&pin=${encodeURIComponent(pin)}`;
+try {
+      // 💡 교사용 페이지와 똑같이 안전한 POST 방식으로 변경!
+      const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ 
+          action: 'searchStudent', // 구글 서버에 있는 함수 이름
+          args: [name, pin]        // 이름과 비밀번호를 배열로 묶어서 전달
+        })
+      });
       
-      const response = await fetch(requestUrl);
-      const dataArray = await response.json(); 
-      
+      const res = await response.json(); 
       els.loading.style.display = 'none';
+
+      // 통신 자체는 성공했지만 서버 내부 에러가 났을 때
+      if (!res.success) {
+        els.resultArea.innerHTML = `<div class="result-card" style="text-align:center; color:#e74c3c; font-weight:bold;">${res.error}</div>`;
+        return;
+      }
+
+      const dataArray = res.data; // 서버가 보내준 진짜 결과 데이터
       
       // 구글 서버에서 보낸 에러 메시지(예: 학생 정보 없음) 처리
       if (dataArray.error) {
