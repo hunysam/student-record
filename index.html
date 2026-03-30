@@ -96,7 +96,7 @@ try {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ 
-          action: 'searchStudent', // 구글 서버에 있는 함수 이름
+          action: 'getStudentRecordsAndLevels', // 구글 서버에 있는 함수 이름
           args: [name, pin]        // 이름과 비밀번호를 배열로 묶어서 전달
         })
       });
