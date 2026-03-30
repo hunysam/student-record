@@ -70,41 +70,6 @@
 <div class="creator-mark">ⓒ Created by hunysam</div>
 
 <script>
-// =========================================================================
-  // 💡 Vercel <-> Google Script 연결 통로 (학생용)
-  // =========================================================================
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyut1CvhMzwvgeIXZ1ZpZoLOrFrndZCDJ5dXehA8WA0VZ-VUdxHn_AYPy7pzDn1DupE/exec";
-  
-  window.google = {
-    script: {
-      run: {
-        withSuccessHandler: function(callback) {
-          return new Proxy({}, {
-            get: function(target, methodName) {
-              return function(...args) {
-                fetch(SCRIPT_URL, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                  body: JSON.stringify({ action: methodName, args: args })
-                })
-                .then(res => res.json())
-                .then(res => {
-                  if (res.success) callback(res.data);
-                  else { console.error(res.error); alert("오류: " + res.error); }
-                })
-                .catch(err => { 
-                  console.error(err); 
-                  alert("통신 오류! 잠시 후 다시 시도해주세요."); 
-                });
-              };
-            }
-          });
-        }
-      }
-    }
-  };
-  // =========================================================================
-  
   // 💡 구글 스크립트 배포 주소 (선생님이 복사해주신 그 주소!)
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyut1CvhMzwvgeIXZ1ZpZoLOrFrndZCDJ5dXehA8WA0VZ-VUdxHn_AYPy7pzDn1DupE/exec";
 
@@ -115,7 +80,6 @@
     loading: document.getElementById('loading')
   };
 
-  // 💡 Fetch API를 사용한 통신 방식 변경
   async function searchRecords() {
     const name = els.nameInput.value.trim();
     const pin = els.pinInput.value.trim();
@@ -127,18 +91,33 @@
     els.loading.style.display = 'block';
 
     try {
-      // 버셀(외부)에서 구글(서버)로 데이터를 요청합니다.
-      const response = await fetch(`${SCRIPT_URL}?action=searchStudent&name=${encodeURIComponent(name)}&pin=${encodeURIComponent(pin)}`);
-      const dataArray = await response.json(); // 알맹이(JSON)를 받아옵니다.
+      // 💡 Vercel(외부)에서 구글(서버)로 안전하게 POST 방식으로 데이터 요청
+      const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'searchStudent', args: [name, pin] })
+      });
+      
+      const res = await response.json(); // 알맹이(JSON)를 받아옵니다.
       
       els.loading.style.display = 'none';
       
-      if (dataArray.error) {
+      // 1. 서버와의 통신 자체 실패 시
+      if (!res.success) {
+        els.resultArea.innerHTML = `<div class="result-card" style="text-align:center; color:#e74c3c; font-weight:bold;">${res.error || "오류가 발생했습니다."}</div>`;
+        return;
+      }
+
+      // 2. 구글에서 성공적으로 반환해준 데이터
+      const dataArray = res.data;
+
+      // 3. 학생 정보가 없거나 비밀번호가 틀린 경우 (데이터 내부 에러)
+      if (dataArray && dataArray.error) {
         els.resultArea.innerHTML = `<div class="result-card" style="text-align:center; color:#e74c3c; font-weight:bold;">${dataArray.error}</div>`;
         return;
       }
 
-      // 화면에 그려주기 (기존 코드와 100% 동일)
+      // 4. 정상 조회 시 화면에 예쁘게 그려주기 (기존 코드 100% 유지)
       const finalHtml = dataArray.map((data, index) => {
         let cardHtml = `<div class="result-card"><h3 class="student-title">🧑‍🎓 ${data.studentInfo}</h3>`;
         
