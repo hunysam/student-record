@@ -5,50 +5,203 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>스마트 체육 키오스크</title>
     <style>
-      body { font-family: 'Malgun Gothic', sans-serif; text-align: center; background-color: #f4f7f6; margin: 0; padding: 20px; }
-      .container { max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-      .tab-btn { padding: 12px 20px; font-size: 16px; margin: 5px; cursor: pointer; border: none; border-radius: 8px; background-color: #ddd; font-weight:bold;}
-      .tab-btn.active { background-color: #4CAF50; color: white; }
-      input, select { font-size: 20px; padding: 12px; margin: 10px 0; width: 80%; text-align: center; border: 2px solid #ccc; border-radius: 8px; }
-      button.submit-btn { font-size: 20px; padding: 12px 30px; background-color: #2196F3; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; width:85%;}
-      #status { margin-top: 20px; font-size: 22px; font-weight: bold; height: 40px; }
-      .hidden { display: none; }
+      /* --- [디자인 테마 설정] --- */
+      :root {
+        --primary-color: #4CAF50; /* 메인 색상 (기존 디자인에 맞춰 파란색이 필요하면 #2196F3 으로 변경하세요) */
+        --primary-dark: #388E3C;
+        --bg-color: #f4f7f6;
+        --card-bg: #ffffff;
+        --text-main: #333333;
+        --text-sub: #777777;
+        --border-color: #e0e0e0;
+        --radius: 12px;
+      }
+
+      /* --- [전체 레이아웃] --- */
+      body { 
+        font-family: 'Pretendard', 'Malgun Gothic', sans-serif; 
+        background-color: var(--bg-color); 
+        margin: 0; 
+        padding: 20px; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        box-sizing: border-box;
+      }
+
+      .container { 
+        width: 100%;
+        max-width: 600px; /* 태블릿 화면에 최적화된 너비 */
+        background: var(--card-bg); 
+        border-radius: var(--radius); 
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08); 
+        overflow: hidden;
+        text-align: center;
+      }
+
+      /* --- [헤더 디자인] --- */
+      .header {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 20px 0;
+        font-size: 24px;
+        font-weight: bold;
+        letter-spacing: 1px;
+      }
+
+      .content-area {
+        padding: 30px;
+      }
+
+      /* --- [탭 버튼 디자인] --- */
+      .tab-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 25px;
+      }
+
+      .tab-btn { 
+        flex: 1;
+        padding: 15px 10px; 
+        font-size: 16px; 
+        cursor: pointer; 
+        border: 2px solid var(--border-color); 
+        border-radius: var(--radius); 
+        background-color: var(--card-bg); 
+        color: var(--text-sub);
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+
+      .tab-btn.active { 
+        background-color: rgba(76, 175, 80, 0.1); /* primary-color의 연한 버전 */
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+      }
+
+      /* --- [입력 폼 디자인] --- */
+      .input-group {
+        margin-bottom: 20px;
+        text-align: left;
+      }
+
+      .input-group label {
+        display: block;
+        font-size: 14px;
+        color: var(--text-sub);
+        margin-bottom: 8px;
+        font-weight: bold;
+      }
+
+      input, select { 
+        width: 100%; 
+        font-size: 18px; 
+        padding: 15px; 
+        border: 1px solid var(--border-color); 
+        border-radius: 8px; 
+        box-sizing: border-box;
+        transition: border-color 0.3s;
+        background-color: #fafafa;
+      }
+
+      input:focus, select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        background-color: #fff;
+      }
+
+      /* --- [제출 버튼 디자인] --- */
+      button.submit-btn { 
+        width: 100%;
+        font-size: 20px; 
+        font-weight: bold;
+        padding: 16px; 
+        background-color: var(--primary-color); 
+        color: white; 
+        border: none; 
+        border-radius: 8px; 
+        cursor: pointer; 
+        margin-top: 10px; 
+        transition: background-color 0.3s;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      }
+
+      button.submit-btn:hover {
+        background-color: var(--primary-dark);
+      }
+
+      button.submit-btn:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+
+      /* --- [상태 메시지] --- */
+      #status { 
+        margin-top: 25px; 
+        font-size: 20px; 
+        font-weight: bold; 
+        min-height: 30px; 
+        padding: 15px;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        color: var(--text-main);
+      }
+
+      .hidden { display: none !important; }
+      .desc-text { color: var(--text-sub); font-size: 15px; margin-bottom: 20px; }
     </style>
   </head>
   <body>
     <div class="container">
-      <h2>🏆 스마트 체육 키오스크</h2>
+      <div class="header">🏆 스마트 체육 키오스크</div>
       
-      <div>
-        <button id="btnRun" class="tab-btn active" onclick="switchTab('run')">🏃 달리기 (자동)</button>
-        <button id="btnKiosk" class="tab-btn" onclick="switchTab('kiosk')">💪 자율 기록 (수동)</button>
-      </div>
-      <hr style="border-top:1px solid #eee; margin:20px 0;">
+      <div class="content-area">
+        <div class="tab-container">
+          <button id="btnRun" class="tab-btn active" onclick="switchTab('run')">🏃 달리기 (자동)</button>
+          <button id="btnKiosk" class="tab-btn" onclick="switchTab('kiosk')">💪 자율 기록 (수동)</button>
+        </div>
 
-      <div id="runMode">
-        <p style="color:gray; font-size:14px;">리더기 앞을 지나가면 자동 기록됩니다.</p>
-        <input type="text" id="rfidInput" placeholder="태그 자동 입력 대기중..." autofocus>
-      </div>
+        <div id="runMode">
+          <p class="desc-text">리더기 앞을 지나가면 자동으로 기록됩니다.</p>
+          <div class="input-group">
+            <input type="text" id="rfidInput" placeholder="태그 자동 입력 대기중..." autofocus>
+          </div>
+        </div>
 
-      <div id="kioskMode" class="hidden">
-        <p style="color:gray; font-size:14px;">자신의 태그 번호와 기록을 입력하세요.</p>
-        <input type="text" id="kioskTag" placeholder="본인 태그 번호 (예: TAG001)">
-        <select id="kioskExercise"><option>로딩 중...</option></select>
-        <input type="number" id="kioskScore" placeholder="기록 (숫자만 입력)">
-        <br>
-        <button class="submit-btn" id="submitBtn" onclick="submitKiosk()">기록 제출하기</button>
-      </div>
+        <div id="kioskMode" class="hidden">
+          <p class="desc-text">자신의 태그 번호와 기록을 직접 입력하세요.</p>
+          
+          <div class="input-group">
+            <label>태그 번호</label>
+            <input type="text" id="kioskTag" placeholder="본인 태그 번호 (예: TAG001)">
+          </div>
+          
+          <div class="input-group">
+            <label>운동 종목</label>
+            <select id="kioskExercise"><option>로딩 중...</option></select>
+          </div>
+          
+          <div class="input-group">
+            <label>오늘의 기록</label>
+            <input type="number" id="kioskScore" placeholder="기록 (숫자만 입력)">
+          </div>
+          
+          <button class="submit-btn" id="submitBtn" onclick="submitKiosk()">기록 제출하기</button>
+        </div>
 
-      <div id="status">대기 중...</div>
+        <div id="status">상태 대기 중...</div>
+      </div>
     </div>
 
     <script>
-      // 🚨 [매우 중요] 아래 따옴표 안에 선생님의 구글 앱스 스크립트 웹앱 주소(exec)를 넣으세요!
+      // 🚨 [매우 중요] 아래 따옴표 안에 선생님의 구글 앱스 스크립트 웹앱 주소(exec)를 꼭 넣으세요!
       const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyut1CvhMzwvgeIXZ1ZpZoLOrFrndZCDJ5dXehA8WA0VZ-VUdxHn_AYPy7pzDn1DupE/exec";
 
       var statusDiv = document.getElementById("status");
 
-      // 구글 서버와 통신하는 공통 함수 (Vercel 연동용)
+      // 구글 서버와 통신하는 공통 함수
       async function callGoogleScript(actionName, argsArray = []) {
         try {
           const response = await fetch(SCRIPT_URL, {
@@ -68,7 +221,6 @@
       }
 
       window.onload = async function() {
-        // 구글 시트 '설정' 탭에서 종목 리스트 불러오기
         const list = await callGoogleScript('getKioskExerciseList');
         if (list) {
           var selectBox = document.getElementById("kioskExercise");
@@ -91,11 +243,13 @@
           document.getElementById('runMode').classList.remove('hidden');
           document.getElementById('btnRun').classList.add('active');
           document.getElementById('rfidInput').focus();
-          statusDiv.innerHTML = "달리기 자동 측정 준비";
+          statusDiv.innerHTML = "달리기 자동 측정 준비 완료";
+          statusDiv.style.color = "var(--text-main)";
         } else {
           document.getElementById('kioskMode').classList.remove('hidden');
           document.getElementById('btnKiosk').classList.add('active');
-          statusDiv.innerHTML = "자율 기록 제출 준비";
+          statusDiv.innerHTML = "자율 기록 제출 준비 완료";
+          statusDiv.style.color = "var(--text-main)";
         }
       }
 
@@ -106,13 +260,14 @@
           if(tagId === "") return;
           
           this.value = ""; 
-          statusDiv.innerHTML = "⏳ 기록 중..."; statusDiv.style.color = "gray";
+          statusDiv.innerHTML = "⏳ 기록 전송 중..."; 
+          statusDiv.style.color = "var(--text-sub)";
           
           const resultMsg = await callGoogleScript('recordRfidRun', [tagId]);
           if(resultMsg) {
             statusDiv.innerHTML = resultMsg;
             if(resultMsg.includes("⚠️")) statusDiv.style.color = "#E53935";
-            else statusDiv.style.color = "#43A047";
+            else statusDiv.style.color = "var(--primary-dark)";
           }
         }
       });
@@ -124,8 +279,9 @@
 
         if(tagId === "" || score === "") { alert("태그 번호와 기록을 모두 입력해주세요!"); return; }
 
-        statusDiv.innerHTML = "⏳ 기록 전송 중..."; statusDiv.style.color = "gray";
-        document.getElementById("submitBtn").disabled = true; // 중복 클릭 방지
+        statusDiv.innerHTML = "⏳ 기록 전송 중..."; 
+        statusDiv.style.color = "var(--text-sub)";
+        document.getElementById("submitBtn").disabled = true;
 
         const resultMsg = await callGoogleScript('recordKioskExercise', [tagId, exercise, score]);
         if(resultMsg) {
@@ -133,7 +289,7 @@
           if(resultMsg.includes("⚠️")) {
              statusDiv.style.color = "#E53935";
           } else {
-             statusDiv.style.color = "#1E88E5";
+             statusDiv.style.color = "var(--primary-dark)";
              document.getElementById("kioskTag").value = "";
              document.getElementById("kioskScore").value = "";
           }
