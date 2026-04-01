@@ -6,34 +6,45 @@
     <title>스마트 체육 키오스크</title>
     <style>
       :root {
-        --primary-color: #4CAF50; 
-        --primary-dark: #388E3C;
-        --bg-color: #f4f7f6;
-        --card-bg: #ffffff;
-        --text-main: #333333;
-        --text-sub: #777777;
-        --border-color: #e0e0e0;
+        --primary-color: #4CAF50; --primary-dark: #388E3C;
+        --blue-team: #1E88E5; --red-team: #E53935;
+        --bg-color: #f4f7f6; --card-bg: #ffffff;
+        --text-main: #333333; --text-sub: #777777; --border-color: #e0e0e0;
         --radius: 12px;
       }
       body { font-family: 'Pretendard', 'Malgun Gothic', sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; }
-      .container { width: 100%; max-width: 600px; background: var(--card-bg); border-radius: var(--radius); box-shadow: 0 8px 20px rgba(0,0,0,0.08); overflow: hidden; text-align: center; }
+      .container { width: 100%; max-width: 650px; background: var(--card-bg); border-radius: var(--radius); box-shadow: 0 8px 20px rgba(0,0,0,0.08); overflow: hidden; text-align: center; }
       .header { background-color: var(--primary-color); color: white; padding: 20px 0; font-size: 24px; font-weight: bold; }
       .content-area { padding: 30px; }
-      .tab-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
-      .tab-btn { flex: 1; padding: 15px 5px; font-size: 16px; cursor: pointer; border: 2px solid var(--border-color); border-radius: var(--radius); background-color: var(--card-bg); color: var(--text-sub); font-weight: bold; transition: all 0.3s ease; }
+      
+      .tab-container { display: flex; justify-content: center; gap: 8px; margin-bottom: 25px; }
+      .tab-btn { flex: 1; padding: 12px 2px; font-size: 15px; cursor: pointer; border: 2px solid var(--border-color); border-radius: 8px; background-color: var(--card-bg); color: var(--text-sub); font-weight: bold; transition: all 0.3s ease; word-break: keep-all; }
       .tab-btn.active { background-color: rgba(76, 175, 80, 0.1); border-color: var(--primary-color); color: var(--primary-color); }
+      
       .input-group { margin-bottom: 20px; text-align: left; }
       .input-group label { display: block; font-size: 14px; color: var(--text-sub); margin-bottom: 8px; font-weight: bold; }
-      input, select { width: 100%; font-size: 18px; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: #fafafa; }
+      input, select { width: 100%; font-size: 18px; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: #fafafa; text-align: center; }
       input:focus, select:focus { outline: none; border-color: var(--primary-color); background-color: #fff; }
       
       button.submit-btn { width: 100%; font-size: 20px; font-weight: bold; padding: 16px; background-color: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; }
       button.batch-end-btn { width: 100%; font-size: 16px; font-weight: bold; padding: 12px; background-color: #E53935; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 15px; transition: 0.3s;}
-      button.batch-end-btn:hover { background-color: #C62828; }
       
       #status { margin-top: 25px; font-size: 18px; font-weight: bold; min-height: 30px; padding: 15px; border-radius: 8px; background-color: #f9f9f9; color: var(--text-main); word-break: keep-all;}
       .hidden { display: none !important; }
       .desc-text { color: var(--text-sub); font-size: 15px; margin-bottom: 10px; }
+
+      /* --- 게임 모드 전용 CSS --- */
+      .game-controls { display: flex; gap: 10px; margin-bottom: 20px; }
+      .btn-start { flex: 1; background-color: var(--primary-color); color: white; padding: 15px; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; }
+      .btn-stop { flex: 1; background-color: #E53935; color: white; padding: 15px; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; }
+      
+      .scoreboard { display: flex; justify-content: space-between; align-items: center; margin: 20px 0; padding: 20px; border-radius: 12px; background-color: #f0f0f0; }
+      .team-box { width: 45%; border-radius: 12px; padding: 20px 0; color: white; }
+      .team-blue { background-color: var(--blue-team); box-shadow: 0 4px 10px rgba(30, 136, 229, 0.4); }
+      .team-red { background-color: var(--red-team); box-shadow: 0 4px 10px rgba(229, 57, 53, 0.4); }
+      .team-title { font-size: 20px; font-weight: bold; margin-bottom: 10px; }
+      .team-score { font-size: 48px; font-weight: 900; }
+      .vs-text { font-size: 24px; font-weight: bold; color: #555; }
     </style>
   </head>
   <body>
@@ -42,24 +53,62 @@
       
       <div class="content-area">
         <div class="tab-container">
-          <button id="btnRun" class="tab-btn active" onclick="switchTab('run')">🏃 달리기 모드</button>
-          <button id="btnKiosk" class="tab-btn" onclick="switchTab('kiosk')">💪 타 종목 자율 기록</button>
+          <button id="btnRun" class="tab-btn active" onclick="switchTab('run')">🏃 달리기</button>
+          <button id="btnKiosk" class="tab-btn" onclick="switchTab('kiosk')">💪 자율기록</button>
+          <button id="btnGame" class="tab-btn" onclick="switchTab('game')">🎮 게임모드</button>
         </div>
 
         <div id="runMode">
-          <p class="desc-text">학생들이 통과하면 개별적으로 기록이 누적됩니다.<br>(※ 10분간 기록이 없으면 개별 자동 종료)</p>
-          <div class="input-group">
-            <input type="text" id="rfidInput" placeholder="태그 스캔 대기중..." autofocus>
-          </div>
-          <button class="batch-end-btn" onclick="endAllRunning()">🛑 전체 달리기 일괄 종료</button>
+          <p class="desc-text">학생 개별 바퀴 수 측정 모드입니다.</p>
+          <div class="input-group"><input type="text" id="rfidInput" placeholder="태그 스캔 대기중..."></div>
+          <button class="batch-end-btn" onclick="endCurrentActivity('run')">🛑 해당 활동 일괄 종료</button>
         </div>
 
         <div id="kioskMode" class="hidden">
-          <p class="desc-text" style="color:var(--primary-dark); font-weight:bold;">※ 이곳에 기록을 제출하면 해당 학생의 달리기는 자동 종료됩니다.</p>
+          <p class="desc-text">자신의 태그 번호와 기록을 직접 입력하세요.</p>
           <div class="input-group"><label>태그 번호</label><input type="text" id="kioskTag" placeholder="본인 태그 (예: TAG001)"></div>
           <div class="input-group"><label>운동 종목</label><select id="kioskExercise"><option>로딩 중...</option></select></div>
           <div class="input-group"><label>오늘의 기록</label><input type="number" id="kioskScore" placeholder="기록 (숫자만 입력)"></div>
           <button class="submit-btn" id="submitBtn" onclick="submitKiosk()">기록 제출하기</button>
+        </div>
+
+        <div id="gameMode" class="hidden">
+          <div class="input-group">
+            <label>진행할 게임 선택</label>
+            <select id="gameSelect" onchange="changeGameUI()">
+              <option value="game1">1. 진지 점령전 (청백전)</option>
+              <option value="game2" disabled>2. 좀비 생존 게임 (준비중)</option>
+              <option value="game3" disabled>3. 미션 빙고 (준비중)</option>
+              <option value="game4" disabled>4. 무궁화 꽃이 (준비중)</option>
+            </select>
+          </div>
+
+          <div class="game-controls">
+            <button class="btn-start" onclick="startGame()">▶️ 게임 시작</button>
+            <button class="btn-stop" onclick="endCurrentActivity('game')">⏹️ 활동 종료</button>
+          </div>
+
+          <div class="input-group" style="height: 1px; overflow: hidden; margin:0;">
+            <input type="text" id="gameRfidInput">
+          </div>
+
+          <div id="game1UI">
+            <p class="desc-text" style="color:var(--primary-dark); font-weight:bold;">
+              태그를 처음 찍는 순서대로 청팀/백팀이 자동 배정됩니다.<br>(연속 스캔 방지: 5초 쿨타임)
+            </p>
+            <div class="scoreboard">
+              <div class="team-box team-blue">
+                <div class="team-title">청팀 🔵</div>
+                <div class="team-score" id="scoreBlue">0</div>
+              </div>
+              <div class="vs-text">VS</div>
+              <div class="team-box team-red">
+                <div class="team-title">백팀 🔴</div>
+                <div class="team-score" id="scoreRed">0</div>
+              </div>
+            </div>
+          </div>
+          
         </div>
 
         <div id="status">상태 대기 중...</div>
@@ -72,9 +121,16 @@
       
       var statusDiv = document.getElementById("status");
 
-      // 🧠 프론트엔드 상태 관리 엔진 (핵심)
-      let activeTags = {};      // 현재 달리고 있는 태그 { "TAG001": 마지막스캔시간(ms) }
-      let finishedTags = new Set(); // 완전히 종료된 태그 목록 (블랙리스트)
+      // --- [상태 관리 변수] ---
+      let activeTags = {};      
+      let finishedTags = new Set(); 
+      
+      // 게임 1 전용 변수
+      let isGameRunning = false;
+      let game1TeamMap = {}; // { "TAG001": "blue", "TAG002": "red" }
+      let game1Cooldowns = {}; // { "TAG001": 마지막스캔시간 }
+      let scoreBlue = 0;
+      let scoreRed = 0;
 
       async function callGoogleScript(actionName, argsArray = []) {
         try {
@@ -82,126 +138,155 @@
           const result = await response.json();
           if (!result.success) throw new Error(result.error);
           return result.data;
-        } catch (error) {
-          console.error(error);
-          return null;
-        }
+        } catch (error) { return null; }
       }
 
       window.onload = async function() {
         const list = await callGoogleScript('getKioskExerciseList');
         if (list) {
-          var selectBox = document.getElementById("kioskExercise");
-          selectBox.innerHTML = "";
+          var selectBox = document.getElementById("kioskExercise"); selectBox.innerHTML = "";
           for(var i = 0; i < list.length; i++) {
             var option = document.createElement("option"); option.value = list[i]; option.text = list[i]; selectBox.appendChild(option);
           }
         }
       };
 
+      // 탭 전환 로직
       function switchTab(mode) {
         document.getElementById('runMode').classList.add('hidden');
         document.getElementById('kioskMode').classList.add('hidden');
+        document.getElementById('gameMode').classList.add('hidden');
         document.getElementById('btnRun').classList.remove('active');
         document.getElementById('btnKiosk').classList.remove('active');
+        document.getElementById('btnGame').classList.remove('active');
 
         if(mode === 'run') {
           document.getElementById('runMode').classList.remove('hidden');
           document.getElementById('btnRun').classList.add('active');
           document.getElementById('rfidInput').focus();
-          statusDiv.innerHTML = "🏃 달리기 측정 준비 완료 (다른 학생들은 계속 달릴 수 있습니다)";
-        } else {
+          statusDiv.innerHTML = "🏃 달리기 측정 준비 완료";
+        } else if (mode === 'kiosk') {
           document.getElementById('kioskMode').classList.remove('hidden');
           document.getElementById('btnKiosk').classList.add('active');
           statusDiv.innerHTML = "💪 자율 기록 제출 준비 완료";
+        } else if (mode === 'game') {
+          document.getElementById('gameMode').classList.remove('hidden');
+          document.getElementById('btnGame').classList.add('active');
+          statusDiv.innerHTML = "🎮 진행할 게임을 선택하고 시작을 눌러주세요.";
         }
       }
 
-      // [핵심] RFID 대량 스캔 처리 로직
+      function changeGameUI() {
+        // 추후 게임2, 3 추가 시 UI 변경 로직 (현재는 1번만 있으므로 유지)
+      }
+
+      // 🎮 게임 시작 버튼
+      function startGame() {
+        isGameRunning = true;
+        
+        // 점수 및 데이터 초기화
+        scoreBlue = 0; scoreRed = 0;
+        game1TeamMap = {}; game1Cooldowns = {};
+        document.getElementById('scoreBlue').innerText = scoreBlue;
+        document.getElementById('scoreRed').innerText = scoreRed;
+        
+        document.getElementById('gameRfidInput').focus();
+        statusDiv.innerHTML = "🔥 진지 점령전이 시작되었습니다! 리더기를 통과하세요!";
+        statusDiv.style.color = "var(--primary-dark)";
+      }
+
+      // 🛑 활동 일괄 종료 (달리기 & 게임 공통)
+      function endCurrentActivity(type) {
+        if(confirm("현재 활동을 종료하시겠습니까?")) {
+          if(type === 'run') {
+            for(let tag in activeTags) finishedTags.add(tag);
+            activeTags = {};
+            statusDiv.innerHTML = "🛑 달리기 활동이 종료되었습니다.";
+          } else if(type === 'game') {
+            isGameRunning = false;
+            statusDiv.innerHTML = `🛑 게임 종료! [청팀 ${scoreBlue} : ${scoreRed} 백팀]`;
+            // 승패 결과 텍스트 추가
+            if(scoreBlue > scoreRed) statusDiv.innerHTML += " - 🔵 청팀 승리!";
+            else if(scoreRed > scoreBlue) statusDiv.innerHTML += " - 🔴 백팀 승리!";
+            else statusDiv.innerHTML += " - 🤝 무승부!";
+          }
+          statusDiv.style.color = "#E53935";
+          document.activeElement.blur(); // 포커스 해제하여 리더기 입력 차단
+        }
+      }
+
+      // 🏃 [달리기 모드] RFID 입력 처리 (이전 로직 동일)
       document.getElementById("rfidInput").addEventListener("keypress", async function(event) {
         if (event.key === "Enter") {
-          event.preventDefault();
-          var tagId = this.value.trim();
-          this.value = ""; // 스캔 즉시 입력창 비우기 (다음 사람을 위해)
-
+          event.preventDefault(); var tagId = this.value.trim(); this.value = "";
           if(tagId === "") return;
-          
           const now = Date.now();
-
-          // 1. 이미 종료 처리된 태그는 완전히 무시
           if (finishedTags.has(tagId)) return;
-
-          // 2. 10분(600000ms) 이상 변화 없으면 개별 종료 처리
-          if (activeTags[tagId] && (now - activeTags[tagId] > 600000)) {
-            finishedTags.add(tagId);
-            delete activeTags[tagId];
-            statusDiv.innerHTML = `🛑 [${tagId}] 10분 경과로 달리기가 자동 종료되었습니다.`;
-            statusDiv.style.color = "#E53935";
-            return;
-          }
-
-          // 3. 10초(10000ms) 쿨타임 무시 (UHF 리더기 중복 스캔 완벽 방어)
-          if (activeTags[tagId] && (now - activeTags[tagId] < 10000)) {
-            return; // 10초 내 스캔은 아무 화면 변화 없이 조용히 무시
-          }
-
-          // --- 검증 통과 (구글 시트로 기록 전송) ---
-          activeTags[tagId] = now; // 마지막 스캔 시간 업데이트
-          statusDiv.innerHTML = "⏳ " + tagId + " 기록 업데이트 중..."; 
-          statusDiv.style.color = "var(--text-sub)";
+          if (activeTags[tagId] && (now - activeTags[tagId] > 600000)) { finishedTags.add(tagId); delete activeTags[tagId]; return; }
+          if (activeTags[tagId] && (now - activeTags[tagId] < 10000)) return; 
           
+          activeTags[tagId] = now;
+          statusDiv.innerHTML = "⏳ " + tagId + " 기록 업데이트 중..."; 
           const resultMsg = await callGoogleScript('recordRfidRun', [tagId]);
           if(resultMsg) {
             statusDiv.innerHTML = resultMsg;
-            if(resultMsg.includes("⚠️")) statusDiv.style.color = "#E53935";
-            else statusDiv.style.color = "var(--primary-dark)";
+            if(resultMsg.includes("⚠️")) statusDiv.style.color = "#E53935"; else statusDiv.style.color = "var(--primary-dark)";
           }
         }
       });
 
-      // 자율 기록 제출 (달리기 개별 종료 연동)
+      // 🎮 [게임 모드] RFID 입력 처리
+      document.getElementById("gameRfidInput").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+          event.preventDefault(); var tagId = this.value.trim(); this.value = "";
+          if(tagId === "" || !isGameRunning) return; // 게임 중이 아니면 무시
+
+          const now = Date.now();
+          
+          // 5초 쿨타임 체크 (머물러서 점수 올리기 방지)
+          if (game1Cooldowns[tagId] && (now - game1Cooldowns[tagId] < 5000)) {
+            statusDiv.innerHTML = `⚠️ ${tagId} 학생, 5초 후에 다시 찍을 수 있습니다!`;
+            statusDiv.style.color = "#E53935";
+            return;
+          }
+
+          // 팀 배정 로직: 등록되지 않은 태그면 자동 배정 (홀/짝 번갈아가며)
+          if (!game1TeamMap[tagId]) {
+            const currentTotalPlayers = Object.keys(game1TeamMap).length;
+            game1TeamMap[tagId] = (currentTotalPlayers % 2 === 0) ? "blue" : "red";
+          }
+
+          // 쿨타임 갱신 및 점수 추가
+          game1Cooldowns[tagId] = now;
+          const myTeam = game1TeamMap[tagId];
+
+          if (myTeam === "blue") {
+            scoreBlue++;
+            document.getElementById('scoreBlue').innerText = scoreBlue;
+            statusDiv.innerHTML = `🔵 청팀 득점! (${tagId})`;
+            statusDiv.style.color = "var(--blue-team)";
+          } else {
+            scoreRed++;
+            document.getElementById('scoreRed').innerText = scoreRed;
+            statusDiv.innerHTML = `🔴 백팀 득점! (${tagId})`;
+            statusDiv.style.color = "var(--red-team)";
+          }
+        }
+      });
+
+      // 자율 기록 제출 로직 (이전과 동일)
       async function submitKiosk() {
+        /* 기존 자율기록 로직 유지 */
         var tagId = document.getElementById("kioskTag").value.trim();
         var exercise = document.getElementById("kioskExercise").value;
         var score = document.getElementById("kioskScore").value.trim();
-        if(tagId === "" || score === "") { alert("태그 번호와 기록을 모두 입력해주세요!"); return; }
-
-        statusDiv.innerHTML = "⏳ 기록 전송 중..."; 
+        if(tagId === "" || score === "") { alert("태그를 모두 입력해주세요!"); return; }
         document.getElementById("submitBtn").disabled = true;
-
-        // 타 종목 입력 시, 해당 학생은 달리기를 끝낸 것으로 간주하고 달리기 종료 명단에 추가
-        finishedTags.add(tagId);
-        delete activeTags[tagId];
-
+        finishedTags.add(tagId); delete activeTags[tagId];
+        statusDiv.innerHTML = "⏳ 전송 중...";
         const resultMsg = await callGoogleScript('recordKioskExercise', [tagId, exercise, score]);
-        if(resultMsg) {
-          statusDiv.innerHTML = resultMsg;
-          if(resultMsg.includes("⚠️")) {
-             statusDiv.style.color = "#E53935";
-          } else {
-             statusDiv.style.color = "var(--primary-dark)";
-             document.getElementById("kioskTag").value = "";
-             document.getElementById("kioskScore").value = "";
-             
-             // 2초 뒤에 다시 달리기 측정 화면으로 자동 복귀 (다른 학생을 위해)
-             setTimeout(() => switchTab('run'), 2000); 
-          }
-        }
+        if(resultMsg) { statusDiv.innerHTML = resultMsg; document.getElementById("kioskTag").value = ""; document.getElementById("kioskScore").value = ""; setTimeout(() => switchTab('run'), 2000); }
         document.getElementById("submitBtn").disabled = false;
-      }
-
-      // 일괄 종료 버튼
-      function endAllRunning() {
-        if(confirm("현재 진행 중인 모든 학생의 달리기를 종료하시겠습니까?\n(다음 반 수업을 시작하려면 화면을 새로고침 하세요.)")) {
-          // 달리고 있던 모든 태그를 종료 명단으로 이동
-          for(let tag in activeTags) {
-            finishedTags.add(tag);
-          }
-          activeTags = {}; // 활성 태그 초기화
-          statusDiv.innerHTML = "🛑 모든 달리기가 일괄 종료되었습니다. 이제 태그를 인식하지 않습니다.";
-          statusDiv.style.color = "#E53935";
-          document.getElementById('rfidInput').focus();
-        }
       }
     </script>
   </body>
