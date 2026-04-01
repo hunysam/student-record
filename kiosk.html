@@ -38,13 +38,22 @@
       .btn-start { flex: 1; background-color: var(--primary-color); color: white; padding: 15px; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; }
       .btn-stop { flex: 1; background-color: #E53935; color: white; padding: 15px; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; }
       
+      /* 게임 1: 점수판 */
       .scoreboard { display: flex; justify-content: space-between; align-items: center; margin: 20px 0; padding: 20px; border-radius: 12px; background-color: #f0f0f0; }
       .team-box { width: 45%; border-radius: 12px; padding: 20px 0; color: white; }
       .team-blue { background-color: var(--blue-team); box-shadow: 0 4px 10px rgba(30, 136, 229, 0.4); }
       .team-red { background-color: var(--red-team); box-shadow: 0 4px 10px rgba(229, 57, 53, 0.4); }
       .team-title { font-size: 20px; font-weight: bold; margin-bottom: 10px; }
       .team-score { font-size: 48px; font-weight: 900; }
-      .vs-text { font-size: 24px; font-weight: bold; color: #555; }
+      
+      /* 게임 2: 좀비 생존자 뱃지 */
+      .survivor-area { border: 2px solid #4CAF50; border-radius: 12px; padding: 15px; margin-bottom: 15px; min-height: 80px;}
+      .zombie-area { border: 2px solid #E53935; border-radius: 12px; padding: 15px; background-color: #ffebee; min-height: 80px;}
+      .badge-survivor { display: inline-block; background-color: #4CAF50; color: white; padding: 8px 12px; border-radius: 20px; margin: 5px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
+      .badge-zombie { display: inline-block; background-color: #333; color: #ff5252; padding: 8px 12px; border-radius: 20px; margin: 5px; font-weight: bold; text-decoration: line-through;}
+      .timer-warn { color: #ffeb3b; }
+      .timer-danger { color: #ff5252; animation: blink 1s infinite; }
+      @keyframes blink { 50% { opacity: 0.5; } }
     </style>
   </head>
   <body>
@@ -77,7 +86,7 @@
             <label>진행할 게임 선택</label>
             <select id="gameSelect" onchange="changeGameUI()">
               <option value="game1">1. 진지 점령전 (청백전)</option>
-              <option value="game2" disabled>2. 좀비 생존 게임 (준비중)</option>
+              <option value="game2">2. 좀비 생존 게임 (백신 스테이션)</option>
               <option value="game3" disabled>3. 미션 빙고 (준비중)</option>
               <option value="game4" disabled>4. 무궁화 꽃이 (준비중)</option>
             </select>
@@ -88,24 +97,30 @@
             <button class="btn-stop" onclick="endCurrentActivity('game')">⏹️ 활동 종료</button>
           </div>
 
-          <div class="input-group" style="height: 1px; overflow: hidden; margin:0;">
-            <input type="text" id="gameRfidInput">
+          <div class="input-group" style="text-align: center;">
+            <input type="text" id="gameRfidInput" placeholder="[리더기 스캔 대기] 직접 입력 테스트 가능" style="font-size:14px; padding:10px; background-color:#e8f5e9;">
           </div>
 
           <div id="game1UI">
-            <p class="desc-text" style="color:var(--primary-dark); font-weight:bold;">
-              태그를 처음 찍는 순서대로 청팀/백팀이 자동 배정됩니다.<br>(연속 스캔 방지: 5초 쿨타임)
-            </p>
+            <p class="desc-text" style="color:var(--primary-dark); font-weight:bold;">태그를 처음 찍는 순서대로 청팀/백팀이 자동 배정됩니다.</p>
             <div class="scoreboard">
-              <div class="team-box team-blue">
-                <div class="team-title">청팀 🔵</div>
-                <div class="team-score" id="scoreBlue">0</div>
-              </div>
-              <div class="vs-text">VS</div>
-              <div class="team-box team-red">
-                <div class="team-title">백팀 🔴</div>
-                <div class="team-score" id="scoreRed">0</div>
-              </div>
+              <div class="team-box team-blue"><div class="team-title">청팀 🔵</div><div class="team-score" id="scoreBlue">0</div></div>
+              <div style="font-size: 24px; font-weight: bold; color: #555;">VS</div>
+              <div class="team-box team-red"><div class="team-title">백팀 🔴</div><div class="team-score" id="scoreRed">0</div></div>
+            </div>
+          </div>
+
+          <div id="game2UI" class="hidden">
+            <p class="desc-text" style="color:var(--primary-dark); font-weight:bold;">
+              태그를 찍으면 3분의 생존 시간이 주어집니다.<br>시간 내에 백신(태그)을 맞지 못하면 좀비가 됩니다!
+            </p>
+            <div class="survivor-area">
+              <h4 style="margin-top:0; color:#388E3C;">🏃‍♂️ 생존자 명단 (백신 유효)</h4>
+              <div id="survivorList">대기 중...</div>
+            </div>
+            <div class="zombie-area">
+              <h4 style="margin-top:0; color:#D32F2F;">🧟 좀비 감염자</h4>
+              <div id="zombieList">아직 감염자가 없습니다.</div>
             </div>
           </div>
           
@@ -118,19 +133,20 @@
     <script>
       // 🚨 [매우 중요] 선생님의 구글 앱스 스크립트 웹앱 주소(exec) 입력!
       const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyut1CvhMzwvgeIXZ1ZpZoLOrFrndZCDJ5dXehA8WA0VZ-VUdxHn_AYPy7pzDn1DupE/exec";
-      
       var statusDiv = document.getElementById("status");
 
-      // --- [상태 관리 변수] ---
-      let activeTags = {};      
-      let finishedTags = new Set(); 
-      
-      // 게임 1 전용 변수
+      let activeTags = {}; let finishedTags = new Set(); 
       let isGameRunning = false;
-      let game1TeamMap = {}; // { "TAG001": "blue", "TAG002": "red" }
-      let game1Cooldowns = {}; // { "TAG001": 마지막스캔시간 }
-      let scoreBlue = 0;
-      let scoreRed = 0;
+      let currentGame = "game1";
+
+      // 게임 1 변수
+      let game1TeamMap = {}; let game1Cooldowns = {}; let scoreBlue = 0; let scoreRed = 0;
+
+      // 게임 2 변수
+      let game2Survivors = {}; // { "TAG001": 남은시간(ms) }
+      let game2Zombies = new Set();
+      let game2Interval;
+      const SURVIVAL_TIME = 180000; // 3분 (180초 = 180000ms). 테스트시 30000(30초)로 줄여보세요!
 
       async function callGoogleScript(actionName, argsArray = []) {
         try {
@@ -151,7 +167,6 @@
         }
       };
 
-      // 탭 전환 로직
       function switchTab(mode) {
         document.getElementById('runMode').classList.add('hidden');
         document.getElementById('kioskMode').classList.add('hidden');
@@ -161,61 +176,133 @@
         document.getElementById('btnGame').classList.remove('active');
 
         if(mode === 'run') {
-          document.getElementById('runMode').classList.remove('hidden');
-          document.getElementById('btnRun').classList.add('active');
-          document.getElementById('rfidInput').focus();
-          statusDiv.innerHTML = "🏃 달리기 측정 준비 완료";
+          document.getElementById('runMode').classList.remove('hidden'); document.getElementById('btnRun').classList.add('active');
+          document.getElementById('rfidInput').focus(); statusDiv.innerHTML = "🏃 달리기 측정 준비 완료";
         } else if (mode === 'kiosk') {
-          document.getElementById('kioskMode').classList.remove('hidden');
-          document.getElementById('btnKiosk').classList.add('active');
+          document.getElementById('kioskMode').classList.remove('hidden'); document.getElementById('btnKiosk').classList.add('active');
           statusDiv.innerHTML = "💪 자율 기록 제출 준비 완료";
         } else if (mode === 'game') {
-          document.getElementById('gameMode').classList.remove('hidden');
-          document.getElementById('btnGame').classList.add('active');
-          statusDiv.innerHTML = "🎮 진행할 게임을 선택하고 시작을 눌러주세요.";
+          document.getElementById('gameMode').classList.remove('hidden'); document.getElementById('btnGame').classList.add('active');
+          changeGameUI(); statusDiv.innerHTML = "🎮 진행할 게임을 선택하고 시작을 눌러주세요.";
         }
       }
 
+      // 선택한 게임에 따라 UI 변경
       function changeGameUI() {
-        // 추후 게임2, 3 추가 시 UI 변경 로직 (현재는 1번만 있으므로 유지)
+        currentGame = document.getElementById("gameSelect").value;
+        document.getElementById("game1UI").classList.add("hidden");
+        document.getElementById("game2UI").classList.add("hidden");
+        
+        if(currentGame === "game1") document.getElementById("game1UI").classList.remove("hidden");
+        else if(currentGame === "game2") document.getElementById("game2UI").classList.remove("hidden");
       }
 
-      // 🎮 게임 시작 버튼
+      // 🎮 게임 시작
       function startGame() {
         isGameRunning = true;
-        
-        // 점수 및 데이터 초기화
-        scoreBlue = 0; scoreRed = 0;
-        game1TeamMap = {}; game1Cooldowns = {};
-        document.getElementById('scoreBlue').innerText = scoreBlue;
-        document.getElementById('scoreRed').innerText = scoreRed;
-        
         document.getElementById('gameRfidInput').focus();
-        statusDiv.innerHTML = "🔥 진지 점령전이 시작되었습니다! 리더기를 통과하세요!";
+        
+        if(currentGame === "game1") {
+          scoreBlue = 0; scoreRed = 0; game1TeamMap = {}; game1Cooldowns = {};
+          document.getElementById('scoreBlue').innerText = scoreBlue; document.getElementById('scoreRed').innerText = scoreRed;
+          statusDiv.innerHTML = "🔥 진지 점령전이 시작되었습니다!";
+        } else if(currentGame === "game2") {
+          clearInterval(game2Interval);
+          game2Survivors = {}; game2Zombies = new Set();
+          updateGame2UI();
+          statusDiv.innerHTML = "🧟 좀비 게임 시작! 태그를 스캔하여 백신을 접종하세요!";
+          
+          // 1초마다 타이머 깎는 엔진
+          game2Interval = setInterval(() => {
+            const now = Date.now();
+            for(let tag in game2Survivors) {
+              if(game2Survivors[tag] < now) {
+                // 3분 초과! 좀비로 감염
+                game2Zombies.add(tag);
+                delete game2Survivors[tag];
+                statusDiv.innerHTML = `🚨 삐빅! [${tag}] 학생이 좀비가 되었습니다!`;
+                statusDiv.style.color = "#E53935";
+              }
+            }
+            updateGame2UI();
+          }, 1000);
+        }
         statusDiv.style.color = "var(--primary-dark)";
       }
 
-      // 🛑 활동 일괄 종료 (달리기 & 게임 공통)
+      // 🛑 활동 종료
       function endCurrentActivity(type) {
-        if(confirm("현재 활동을 종료하시겠습니까?")) {
-          if(type === 'run') {
-            for(let tag in activeTags) finishedTags.add(tag);
-            activeTags = {};
-            statusDiv.innerHTML = "🛑 달리기 활동이 종료되었습니다.";
-          } else if(type === 'game') {
-            isGameRunning = false;
-            statusDiv.innerHTML = `🛑 게임 종료! [청팀 ${scoreBlue} : ${scoreRed} 백팀]`;
-            // 승패 결과 텍스트 추가
-            if(scoreBlue > scoreRed) statusDiv.innerHTML += " - 🔵 청팀 승리!";
-            else if(scoreRed > scoreBlue) statusDiv.innerHTML += " - 🔴 백팀 승리!";
-            else statusDiv.innerHTML += " - 🤝 무승부!";
-          }
-          statusDiv.style.color = "#E53935";
-          document.activeElement.blur(); // 포커스 해제하여 리더기 입력 차단
+        if(!confirm("현재 활동을 종료하시겠습니까?")) return;
+        if(type === 'run') {
+          for(let tag in activeTags) finishedTags.add(tag);
+          activeTags = {}; statusDiv.innerHTML = "🛑 달리기 활동 종료.";
+        } else if(type === 'game') {
+          isGameRunning = false;
+          clearInterval(game2Interval); // 좀비게임 타이머 정지
+          statusDiv.innerHTML = "🛑 게임이 종료되었습니다!";
         }
+        statusDiv.style.color = "#E53935";
+        document.activeElement.blur(); 
       }
 
-      // 🏃 [달리기 모드] RFID 입력 처리 (이전 로직 동일)
+      // 🎮 [게임 모드] RFID 입력 처리
+      document.getElementById("gameRfidInput").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+          event.preventDefault(); var tagId = this.value.trim(); this.value = "";
+          if(tagId === "" || !isGameRunning) return; 
+
+          const now = Date.now();
+          
+          if(currentGame === "game1") {
+            if (game1Cooldowns[tagId] && (now - game1Cooldowns[tagId] < 5000)) {
+              statusDiv.innerHTML = `⚠️ 5초 후 다시 찍으세요!`; statusDiv.style.color = "#E53935"; return;
+            }
+            if (!game1TeamMap[tagId]) { game1TeamMap[tagId] = (Object.keys(game1TeamMap).length % 2 === 0) ? "blue" : "red"; }
+            game1Cooldowns[tagId] = now; const myTeam = game1TeamMap[tagId];
+            if (myTeam === "blue") { scoreBlue++; document.getElementById('scoreBlue').innerText = scoreBlue; statusDiv.innerHTML = `🔵 청팀 득점!`; statusDiv.style.color = "var(--blue-team)"; } 
+            else { scoreRed++; document.getElementById('scoreRed').innerText = scoreRed; statusDiv.innerHTML = `🔴 백팀 득점!`; statusDiv.style.color = "var(--red-team)"; }
+          } 
+          else if(currentGame === "game2") {
+            if(game2Zombies.has(tagId)) {
+              statusDiv.innerHTML = `🧟 [${tagId}] 이미 좀비에 감염되었습니다! 백신 무효!`;
+              statusDiv.style.color = "#E53935";
+              return;
+            }
+            // 백신 투여! (현재 시간 + 3분)
+            game2Survivors[tagId] = now + SURVIVAL_TIME;
+            statusDiv.innerHTML = `💉 [${tagId}] 백신 투여 완료! 생존 시간 3분 연장!`;
+            statusDiv.style.color = "#4CAF50";
+            updateGame2UI();
+          }
+        }
+      });
+
+      // 게임 2(좀비) 화면 업데이트 엔진
+      function updateGame2UI() {
+        const survivorDiv = document.getElementById("survivorList");
+        const zombieDiv = document.getElementById("zombieList");
+        const now = Date.now();
+        
+        let sHTML = "";
+        for(let tag in game2Survivors) {
+          const timeLeftStr = Math.max(0, Math.ceil((game2Survivors[tag] - now) / 1000));
+          const mins = String(Math.floor(timeLeftStr / 60)).padStart(2, '0');
+          const secs = String(timeLeftStr % 60).padStart(2, '0');
+          
+          let timerClass = "";
+          if(timeLeftStr <= 30) timerClass = "timer-danger";
+          else if(timeLeftStr <= 60) timerClass = "timer-warn";
+
+          sHTML += `<span class="badge-survivor">${tag} <span class="${timerClass}">⏳ ${mins}:${secs}</span></span>`;
+        }
+        survivorDiv.innerHTML = sHTML || "백신 대기 중...";
+
+        let zHTML = "";
+        game2Zombies.forEach(tag => { zHTML += `<span class="badge-zombie">🧟 ${tag}</span>`; });
+        zombieDiv.innerHTML = zHTML || "아직 감염자가 없습니다.";
+      }
+
+      // 달리기 및 자율기록 로직 유지
       document.getElementById("rfidInput").addEventListener("keypress", async function(event) {
         if (event.key === "Enter") {
           event.preventDefault(); var tagId = this.value.trim(); this.value = "";
@@ -224,67 +311,17 @@
           if (finishedTags.has(tagId)) return;
           if (activeTags[tagId] && (now - activeTags[tagId] > 600000)) { finishedTags.add(tagId); delete activeTags[tagId]; return; }
           if (activeTags[tagId] && (now - activeTags[tagId] < 10000)) return; 
-          
           activeTags[tagId] = now;
           statusDiv.innerHTML = "⏳ " + tagId + " 기록 업데이트 중..."; 
           const resultMsg = await callGoogleScript('recordRfidRun', [tagId]);
-          if(resultMsg) {
-            statusDiv.innerHTML = resultMsg;
-            if(resultMsg.includes("⚠️")) statusDiv.style.color = "#E53935"; else statusDiv.style.color = "var(--primary-dark)";
-          }
+          if(resultMsg) { statusDiv.innerHTML = resultMsg; }
         }
       });
-
-      // 🎮 [게임 모드] RFID 입력 처리
-      document.getElementById("gameRfidInput").addEventListener("keypress", function(event) {
-        if (event.key === "Enter") {
-          event.preventDefault(); var tagId = this.value.trim(); this.value = "";
-          if(tagId === "" || !isGameRunning) return; // 게임 중이 아니면 무시
-
-          const now = Date.now();
-          
-          // 5초 쿨타임 체크 (머물러서 점수 올리기 방지)
-          if (game1Cooldowns[tagId] && (now - game1Cooldowns[tagId] < 5000)) {
-            statusDiv.innerHTML = `⚠️ ${tagId} 학생, 5초 후에 다시 찍을 수 있습니다!`;
-            statusDiv.style.color = "#E53935";
-            return;
-          }
-
-          // 팀 배정 로직: 등록되지 않은 태그면 자동 배정 (홀/짝 번갈아가며)
-          if (!game1TeamMap[tagId]) {
-            const currentTotalPlayers = Object.keys(game1TeamMap).length;
-            game1TeamMap[tagId] = (currentTotalPlayers % 2 === 0) ? "blue" : "red";
-          }
-
-          // 쿨타임 갱신 및 점수 추가
-          game1Cooldowns[tagId] = now;
-          const myTeam = game1TeamMap[tagId];
-
-          if (myTeam === "blue") {
-            scoreBlue++;
-            document.getElementById('scoreBlue').innerText = scoreBlue;
-            statusDiv.innerHTML = `🔵 청팀 득점! (${tagId})`;
-            statusDiv.style.color = "var(--blue-team)";
-          } else {
-            scoreRed++;
-            document.getElementById('scoreRed').innerText = scoreRed;
-            statusDiv.innerHTML = `🔴 백팀 득점! (${tagId})`;
-            statusDiv.style.color = "var(--red-team)";
-          }
-        }
-      });
-
-      // 자율 기록 제출 로직 (이전과 동일)
       async function submitKiosk() {
-        /* 기존 자율기록 로직 유지 */
-        var tagId = document.getElementById("kioskTag").value.trim();
-        var exercise = document.getElementById("kioskExercise").value;
-        var score = document.getElementById("kioskScore").value.trim();
-        if(tagId === "" || score === "") { alert("태그를 모두 입력해주세요!"); return; }
-        document.getElementById("submitBtn").disabled = true;
-        finishedTags.add(tagId); delete activeTags[tagId];
-        statusDiv.innerHTML = "⏳ 전송 중...";
-        const resultMsg = await callGoogleScript('recordKioskExercise', [tagId, exercise, score]);
+        var tagId = document.getElementById("kioskTag").value.trim(); var exercise = document.getElementById("kioskExercise").value; var score = document.getElementById("kioskScore").value.trim();
+        if(tagId === "" || score === "") return;
+        document.getElementById("submitBtn").disabled = true; finishedTags.add(tagId); delete activeTags[tagId];
+        statusDiv.innerHTML = "⏳ 전송 중..."; const resultMsg = await callGoogleScript('recordKioskExercise', [tagId, exercise, score]);
         if(resultMsg) { statusDiv.innerHTML = resultMsg; document.getElementById("kioskTag").value = ""; document.getElementById("kioskScore").value = ""; setTimeout(() => switchTab('run'), 2000); }
         document.getElementById("submitBtn").disabled = false;
       }
