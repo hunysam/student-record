@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>스마트 체육 키오스크</title>
+    <title>스마트 체육 키오스크 - 범용 플랫폼</title>
     <style>
       :root {
         --primary-color: #4CAF50; --primary-dark: #388E3C;
@@ -12,66 +12,55 @@
         --text-main: #333333; --text-sub: #777777; --border-color: #e0e0e0;
         --radius: 12px;
       }
-      body { font-family: 'Pretendard', 'Malgun Gothic', sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; }
+      body { font-family: 'Pretendard', 'Malgun Gothic', sans-serif; background-color: var(--bg-color); margin: 0; padding: 15px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; }
       .container { width: 100%; max-width: 650px; background: var(--card-bg); border-radius: var(--radius); box-shadow: 0 8px 20px rgba(0,0,0,0.08); overflow: hidden; text-align: center; position: relative;}
       .header { background-color: var(--primary-color); color: white; padding: 20px 0; font-size: 24px; font-weight: bold; }
-      .content-area { padding: 30px; }
+      .content-area { padding: 25px; }
       
       /* 메인 탭 */
-      .tab-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-      .tab-btn { flex: 1; padding: 15px 5px; font-size: 18px; cursor: pointer; border: 2px solid var(--border-color); border-radius: 8px; background-color: var(--card-bg); color: var(--text-sub); font-weight: bold; transition: all 0.3s ease; }
+      .tab-container { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
+      .tab-btn { flex: 1; padding: 12px 2px; font-size: 16px; cursor: pointer; border: 2px solid var(--border-color); border-radius: 8px; background-color: var(--card-bg); color: var(--text-sub); font-weight: bold; transition: 0.3s; }
       .tab-btn.active { background-color: rgba(76, 175, 80, 0.1); border-color: var(--primary-color); color: var(--primary-color); }
       
       /* 공통 요소 */
-      .input-group { margin-bottom: 20px; text-align: left; position: relative;}
-      .input-group label { display: block; font-size: 15px; color: var(--text-sub); margin-bottom: 8px; font-weight: bold; }
-      input, select { width: 100%; font-size: 18px; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: #fafafa; text-align: center; font-weight:bold; color:var(--text-main);}
-      input:focus, select:focus { outline: none; border-color: var(--primary-color); background-color: #fff; }
+      .input-group { margin-bottom: 15px; text-align: left; }
+      .input-group label { display: block; font-size: 14px; color: var(--text-sub); margin-bottom: 6px; font-weight: bold; }
+      input, select { width: 100%; font-size: 16px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; text-align: center; font-weight:bold; }
       
-      button.submit-btn { width: 100%; font-size: 20px; font-weight: bold; padding: 16px; background-color: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; }
-      button.batch-end-btn { width: 100%; font-size: 16px; font-weight: bold; padding: 12px; background-color: #E53935; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 15px; transition: 0.3s;}
-      
-      #status { margin-top: 25px; font-size: 18px; font-weight: bold; min-height: 30px; padding: 15px; border-radius: 8px; background-color: #f9f9f9; color: var(--text-main); word-break: keep-all;}
+      .controls-row { display: flex; gap: 10px; margin-bottom: 15px; }
+      .btn-start { flex: 1; background-color: var(--primary-color); color: white; padding: 12px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; }
+      .btn-stop { flex: 1; background-color: #E53935; color: white; padding: 12px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; }
+      .btn-info { background-color: #0288D1; color: white; border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; }
+
+      #status { margin-top: 20px; font-size: 17px; font-weight: bold; padding: 12px; border-radius: 8px; background-color: #f9f9f9; min-height: 24px;}
       .hidden { display: none !important; }
-      .desc-text { color: var(--text-sub); font-size: 15px; margin-bottom: 15px; line-height:1.5;}
 
-      /* 상단 컨트롤러 (시작/종료) */
-      .controls-row { display: flex; gap: 10px; margin-bottom: 20px; }
-      .btn-start { flex: 1; background-color: var(--primary-color); color: white; padding: 15px; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; }
-      .btn-stop { flex: 1; background-color: #E53935; color: white; padding: 15px; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; }
-      .game-header-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px; }
-      .btn-info { background-color: #0288D1; color: white; border: none; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: bold; cursor: pointer; }
-
-      /* 모달(설명창) CSS */
-      .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 100; border-radius: var(--radius); }
-      .modal-content { background: white; padding: 25px; border-radius: 12px; width: 80%; max-width: 400px; text-align: left; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-      .modal-title { font-size: 20px; font-weight: bold; margin-top: 0; color: var(--primary-dark); border-bottom: 2px solid var(--border-color); padding-bottom: 10px;}
-      .modal-body { font-size: 15px; line-height: 1.6; color: var(--text-main); margin: 15px 0; word-break: keep-all; }
-      .btn-close-modal { width: 100%; padding: 12px; background: #555; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
-
-      /* 게임 및 측정 UI 전용 CSS */
-      .scoreboard { display: flex; justify-content: space-between; align-items: center; margin: 15px 0; padding: 20px; border-radius: 12px; background-color: #f0f0f0; }
+      /* --- 게임 UI 특화 --- */
+      /* 1. 팀 대항전 */
+      .scoreboard { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
       .team-box { width: 45%; border-radius: 12px; padding: 15px 0; color: white; }
-      .team-blue { background-color: var(--blue-team); box-shadow: 0 4px 10px rgba(30, 136, 229, 0.4); }
-      .team-red { background-color: var(--red-team); box-shadow: 0 4px 10px rgba(229, 57, 53, 0.4); }
-      .team-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
-      .team-score { font-size: 40px; font-weight: 900; }
-      
-      .survivor-area { border: 2px solid #4CAF50; border-radius: 12px; padding: 15px; margin-bottom: 15px; min-height: 80px;}
-      .zombie-area { border: 2px solid #E53935; border-radius: 12px; padding: 15px; background-color: #ffebee; min-height: 80px;}
-      .badge-survivor { display: inline-block; background-color: #4CAF50; color: white; padding: 8px 12px; border-radius: 20px; margin: 5px; font-weight: bold; }
-      .badge-zombie { display: inline-block; background-color: #333; color: #ff5252; padding: 8px 12px; border-radius: 20px; margin: 5px; font-weight: bold; text-decoration: line-through;}
-      .timer-warn { color: #ffeb3b; } .timer-danger { color: #ff5252; animation: blink 1s infinite; }
-      @keyframes blink { 50% { opacity: 0.5; } }
+      .team-blue { background-color: var(--blue-team); }
+      .team-red { background-color: var(--red-team); }
+      .team-score { font-size: 45px; font-weight: 900; }
 
-      .ranking-area { background: #fff; border: 2px solid var(--border-color); border-radius: 12px; padding: 15px; max-height: 250px; overflow-y: auto; text-align: left; }
-      .rank-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #eee; font-size: 16px; font-weight: bold; align-items: center;}
-      .rank-item:last-child { border-bottom: none; }
-      .rank-1 { background-color: rgba(255, 215, 0, 0.1); color: #B8860B; } .rank-2 { background-color: rgba(192, 192, 192, 0.1); color: #708090; } .rank-3 { background-color: rgba(205, 127, 50, 0.1); color: #8B4513; }
-      .rank-score { background: var(--primary-color); color: white; padding: 5px 12px; border-radius: 15px; font-size: 15px; }
-      .rank-time { background: #0288D1; color: white; padding: 5px 12px; border-radius: 15px; font-size: 16px; font-family: monospace;}
-      
-      .live-timer { font-size: 45px; font-weight: 900; color: var(--primary-dark); margin: 15px 0; font-family: monospace; letter-spacing: 2px;}
+      /* 4. 릴레이 전용 */
+      .lap-list { background: #f0f4f8; border-radius: 10px; padding: 10px; max-height: 200px; overflow-y: auto; text-align: left; }
+      .lap-item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #ddd; font-family: monospace; font-weight: bold;}
+
+      /* 5. 협동전 전용 (게이지) */
+      .coop-container { margin: 20px 0; }
+      .progress-bg { background: #eee; border-radius: 20px; height: 40px; width: 100%; overflow: hidden; position: relative; border: 2px solid #ddd;}
+      .progress-fill { background: linear-gradient(90deg, #FFD700, #4CAF50); height: 100%; width: 0%; transition: width 0.5s ease-out; }
+      .progress-text { position: absolute; width: 100%; top: 50%; left: 0; transform: translateY(-50%); font-weight: 900; color: #333; }
+
+      /* 공통 랭킹 리스트 */
+      .ranking-area { background: #fff; border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; max-height: 200px; overflow-y: auto; text-align: left; margin-top:10px;}
+      .rank-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;}
+      .rank-1 { color: #B8860B; background: #fffdf0; }
+
+      /* 모달 */
+      .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 100; }
+      .modal-content { background: white; padding: 20px; border-radius: 12px; width: 85%; max-width: 400px; text-align: left; }
     </style>
   </head>
   <body>
@@ -79,9 +68,9 @@
       
       <div id="infoModal" class="modal-overlay hidden">
         <div class="modal-content">
-          <h3 class="modal-title" id="modalTitle">설명</h3>
-          <div class="modal-body" id="modalBody">내용</div>
-          <button class="btn-close-modal" onclick="closeModal()">확인</button>
+          <h3 id="modalTitle" style="margin-top:0; color:var(--primary-dark);"></h3>
+          <div id="modalBody" style="font-size:15px; line-height:1.6; margin-bottom:20px;"></div>
+          <button style="width:100%; padding:12px; background:#555; color:white; border:none; border-radius:8px; cursor:pointer;" onclick="closeModal()">확인</button>
         </div>
       </div>
 
@@ -93,87 +82,72 @@
           <button id="btnGame" class="tab-btn" onclick="switchMainTab('game')">🎮 게임 모드</button>
         </div>
 
-        <div id="globalInputArea" class="input-group" style="text-align: center;">
-          <input type="text" id="globalRfidInput" placeholder="[리더기 스캔 대기] 직접 입력하여 테스트 가능" style="font-size:14px; padding:10px; background-color:#e8f5e9;">
+        <div id="globalInputArea" class="input-group">
+          <input type="text" id="globalRfidInput" placeholder="[리더기 스캔 대기]">
         </div>
 
         <div id="basicModeArea">
           <div class="input-group">
-            <label>정규 측정 항목 선택</label>
+            <label>측정 항목 선택</label>
             <select id="basicSelect" onchange="changeBasicUI()">
-              <option value="basic1">1. 달리기 (바퀴 수 누적 측정)</option>
+              <option value="basic1">1. 달리기 (바퀴 수 누적)</option>
               <option value="basic2">2. 달리기 (초정밀 결승선 타이머)</option>
               <option value="basic3">3. 자율 운동 기록 (수동 제출)</option>
             </select>
           </div>
-
           <div id="basic1UI">
-            <p class="desc-text">학생들이 통과할 때마다 바퀴 수가 자동 누적됩니다.<br>(※ 10분간 움직임이 없으면 자동 종료)</p>
-            <button class="batch-end-btn" onclick="endActivity('basic1')">🛑 측정 일괄 종료 및 초기화</button>
+            <button class="btn-stop" style="width:100%" onclick="endActivity('basic1')">🛑 측정 일괄 종료</button>
           </div>
-
           <div id="basic2UI" class="hidden">
-            <div class="controls-row">
-              <button class="btn-start" onclick="startBasic2()">▶️ 타이머 시작</button>
-              <button class="btn-stop" onclick="endActivity('basic2')">⏹️ 초기화</button>
-            </div>
-            <p class="desc-text" style="color:var(--primary-dark); font-weight:bold;">타이머가 돌아갈 때 태그를 찍으면 도착 시간이 기록됩니다.</p>
-            <div class="live-timer" id="basic2Timer">00:00.00</div>
-            <div class="ranking-area" id="basic2Ranking">
-              <div style="color:var(--text-sub); text-align:center; padding:20px;">결승선 대기 중...</div>
-            </div>
+            <div class="controls-row"><button class="btn-start" onclick="startBasic2()">▶️ 타이머 시작</button><button class="btn-stop" onclick="endActivity('basic2')">⏹️ 초기화</button></div>
+            <div id="basic2Timer" style="font-size:40px; font-family:monospace; font-weight:bold; color:var(--primary-dark);">00:00.00</div>
+            <div class="ranking-area" id="basic2Ranking"></div>
           </div>
-
           <div id="basic3UI" class="hidden">
-            <p class="desc-text">자신의 태그 번호와 기록을 직접 입력하세요.</p>
-            <div class="input-group"><label>태그 번호</label><input type="text" id="kioskTag" placeholder="본인 태그 (예: TAG001)"></div>
-            <div class="input-group"><label>운동 종목</label><select id="kioskExercise"><option>로딩 중...</option></select></div>
-            <div class="input-group"><label>오늘의 기록</label><input type="number" id="kioskScore" placeholder="기록 (숫자만 입력)"></div>
-            <button class="submit-btn" id="submitBtn" onclick="submitKiosk()">기록 제출하기</button>
+            <div class="input-group"><input type="text" id="kioskTag" placeholder="본인 태그"></div>
+            <div class="input-group"><select id="kioskExercise"></select></div>
+            <div class="input-group"><input type="number" id="kioskScore" placeholder="오늘의 기록(숫자)"></div>
+            <button class="btn-start" style="width:100%" onclick="submitKiosk()">기록 제출하기</button>
           </div>
         </div>
 
         <div id="gameModeArea" class="hidden">
           <div class="input-group">
-            <div class="game-header-row">
-              <label style="margin-bottom:0;">진행할 게임 선택</label>
-              <button class="btn-info" onclick="openInfoModal()">ℹ️ 게임 설명 보기</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+              <label style="margin:0;">범용 게임 선택</label>
+              <button class="btn-info" onclick="openInfoModal()">ℹ️ 설명</button>
             </div>
             <select id="gameSelect" onchange="changeGameUI()">
-              <option value="game1">1. 진지 점령전 (청백전)</option>
-              <option value="game2">2. 좀비 생존 게임 (백신 스테이션)</option>
-              <option value="game3">3. 미션 랭킹전 (런닝맨)</option>
+              <option value="game1">1. [팀 대항전] 진지 점령 (팀 스택 누적)</option>
+              <option value="game2">2. [생존/인터벌] 좀비 생존 (타이머 리셋)</option>
+              <option value="game3">3. [개인 누적전] 미션 랭킹 (개인 스택 누적)</option>
+              <option value="game4">4. [릴레이전] 이어달리기 (랩타임 측정)</option>
+              <option value="game5">5. [학급 협동전] 에너지 모으기 (전체 합계)</option>
             </select>
           </div>
+          <div class="controls-row"><button class="btn-start" onclick="startGame()">▶️ 게임 시작</button><button class="btn-stop" onclick="endActivity('game')">⏹️ 활동 종료</button></div>
 
-          <div class="controls-row">
-            <button class="btn-start" onclick="startGame()">▶️ 게임 시작</button>
-            <button class="btn-stop" onclick="endActivity('game')">⏹️ 활동 종료</button>
-          </div>
-
-          <div id="game1UI">
+          <div id="game1UI" class="hidden">
             <div class="scoreboard">
-              <div class="team-box team-blue"><div class="team-title">청팀 🔵</div><div class="team-score" id="scoreBlue">0</div></div>
-              <div style="font-size: 24px; font-weight: bold; color: #555;">VS</div>
-              <div class="team-box team-red"><div class="team-title">백팀 🔴</div><div class="team-score" id="scoreRed">0</div></div>
+              <div class="team-box team-blue"><div>청팀</div><div class="team-score" id="scoreBlue">0</div></div>
+              <div class="team-box team-red"><div>백팀</div><div class="team-score" id="scoreRed">0</div></div>
             </div>
           </div>
-
           <div id="game2UI" class="hidden">
-            <div class="survivor-area">
-              <h4 style="margin-top:0; color:#388E3C;">🏃‍♂️ 생존자 명단 (백신 유효)</h4>
-              <div id="survivorList">대기 중...</div>
-            </div>
-            <div class="zombie-area">
-              <h4 style="margin-top:0; color:#D32F2F;">🧟 좀비 감염자</h4>
-              <div id="zombieList">아직 감염자가 없습니다.</div>
-            </div>
+            <div id="survivorList" class="ranking-area" style="height:120px;"></div>
+            <div id="zombieList" class="ranking-area" style="height:80px; background:#fff1f1;"></div>
           </div>
-
-          <div id="game3UI" class="hidden">
-            <h4 style="text-align:left; color:var(--primary-dark); margin-top:0;">🏆 실시간 미션 수행 랭킹</h4>
-            <div class="ranking-area" id="rankingList">
-              <div style="color:var(--text-sub); text-align:center; padding:20px;">게임을 시작하고 태그를 찍어주세요!</div>
+          <div id="game3UI" class="hidden"><div id="rankingList" class="ranking-area"></div></div>
+          
+          <div id="game4UI" class="hidden">
+             <div id="game4Timer" style="font-size:30px; font-family:monospace; margin-bottom:10px;">누적: 00:00.00</div>
+             <div id="lapList" class="lap-list"></div>
+          </div>
+          
+          <div id="game5UI" class="hidden">
+            <div class="coop-container">
+              <label>목표 점수: <input type="number" id="coopTarget" value="100" style="width:60px; padding:2px; font-size:14px;"> 찍기</label>
+              <div class="progress-bg"><div id="progressFill" class="progress-fill"></div><div id="progressText" class="progress-text">0 / 100</div></div>
             </div>
           </div>
         </div>
@@ -183,259 +157,200 @@
     </div>
 
     <script>
-      // 🚨 [매우 중요] 선생님의 구글 앱스 스크립트 웹앱 주소(exec) 입력!
       const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyut1CvhMzwvgeIXZ1ZpZoLOrFrndZCDJ5dXehA8WA0VZ-VUdxHn_AYPy7pzDn1DupE/exec";
       var statusDiv = document.getElementById("status");
-
-      // --- 상태 관리 변수 ---
-      let currentMainTab = "basic"; // 'basic' or 'game'
-      let currentBasic = "basic1"; 
-      let currentGame = "game1";
-
-      // Basic 1 (바퀴 수)
-      let activeTags = {}; let finishedTags = new Set(); 
-      // Basic 2 (타이머)
-      let isBasic2Running = false; let basic2StartTime = 0; let basic2Results = []; let basic2Finished = new Set(); let basic2Interval;
-      // Games
-      let isGameRunning = false;
-      let game1TeamMap = {}; let game1Cooldowns = {}; let scoreBlue = 0; let scoreRed = 0;
-      let game2Survivors = {}; let game2Zombies = new Set(); let game2Interval; const SURVIVAL_TIME = 180000; // 3분
-      let game3Scores = {}; let game3Cooldowns = {};
+      let currentMainTab = "basic", currentBasic = "basic1", currentGame = "game1";
+      
+      // 상태 데이터
+      let activeTags = {}, finishedTags = new Set();
+      let isBasic2Running = false, basic2StartTime = 0, basic2Results = [], basic2Finished = new Set(), basic2Interval;
+      let isGameRunning = false, game1TeamMap = {}, game1Cooldowns = {}, scoreBlue = 0, scoreRed = 0;
+      let game2Survivors = {}, game2Zombies = new Set(), game2Interval;
+      let game3Scores = {}, game3Cooldowns = {};
+      let game4StartTime = 0, game4Laps = [], game4Interval;
+      let game5Total = 0;
 
       const gameInfoData = {
-        "game1": { title: "🔵🔴 1. 진지 점령전 (청백전)", desc: "처음 태그를 찍는 순서대로 청팀과 백팀에 번갈아가며 자동 배정됩니다.<br><br>태그를 찍을 때마다 자기 팀의 점수가 1점씩 올라갑니다. 제한 시간 동안 고지(리더기)를 더 많이 차지한 팀이 승리합니다.<br><br><span style='color:red;'>※ 꼼수 방지:</span> 한 번 찍으면 5초 동안은 연속으로 점수를 획득할 수 없습니다." },
-        "game2": { title: "🧟‍♂️ 2. 좀비 생존 게임", desc: "게임을 시작하고 리더기를 찍으면 '생존자'로 등록되며 3분의 생존 타이머가 시작됩니다.<br><br>생존자는 타이머가 0초가 되기 전에 리더기로 도망쳐와서 다시 백신(태그)을 맞아야 생존 시간이 3분으로 리셋됩니다. 시간 내에 찍지 못하면 좀비로 변이됩니다!" },
-        "game3": { title: "🏃‍♂️ 3. 미션 랭킹전 (런닝맨)", desc: "체육관 곳곳에 숨겨진 미션을 수행하고 돌아와서 리더기에 태그를 찍어 인증(스택 추가)하세요!<br><br>태그를 찍을 때마다 미션 수행 횟수가 1씩 올라가며, 실시간 1~꼴등 랭킹이 전광판에 자동 반영됩니다.<br><br><span style='color:red;'>※ 꼼수 방지:</span> 미션을 수행할 시간을 주기 위해 한 번 찍으면 10초 동안은 다시 찍을 수 없습니다." }
+        "game1": { title: "🔵🔴 [팀 대항전] 진지 점령", desc: "찍는 순서대로 청/백팀 자동 배정!<br>제한 시간 동안 리더기를 더 많이 찍은 팀이 승리합니다.<br>(5초 중복 방지 적용)" },
+        "game2": { title: "🧟 [생존/인터벌] 좀비 생존", desc: "태그 시 3분의 생존 시간이 부여됩니다.<br>시간이 다 되기 전 다시 찍어 리셋하지 못하면 좀비가 됩니다!" },
+        "game3": { title: "🏃 [개인 누적전] 미션 랭킹", desc: "개인별로 찍은 횟수를 실시간 랭킹으로 보여줍니다.<br>미션 수행 후 인증하는 용도로 최적입니다.<br>(10초 중복 방지)" },
+        "game4": { title: "⏱️ [릴레이전] 랩타임 측정", desc: "RFID 태그를 바톤처럼 사용하세요!<br>찍을 때마다 주자별 소요 시간과 전체 누적 시간이 기록됩니다." },
+        "game5": { title: "🤝 [학급 협동전] 에너지 모으기", desc: "우리 반 전체가 힘을 합쳐 목표 점수를 채우는 모드입니다.<br>경쟁 대신 협동이 필요한 수업에 사용하세요." }
       };
 
-      // --- 구글 통신 ---
-      async function callGoogleScript(actionName, argsArray = []) {
+      async function callGoogleScript(a, args = []) {
         try {
-          const response = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: actionName, args: argsArray }) });
-          const result = await response.json();
-          if (!result.success) throw new Error(result.error); return result.data;
-        } catch (error) { return null; }
+          const r = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: a, args: args }) });
+          const res = await r.json(); return res.success ? res.data : null;
+        } catch (e) { return null; }
       }
 
-      window.onload = async function() {
+      window.onload = async () => {
         const list = await callGoogleScript('getKioskExerciseList');
         if (list) {
-          var selectBox = document.getElementById("kioskExercise"); selectBox.innerHTML = "";
-          for(var i = 0; i < list.length; i++) {
-            var option = document.createElement("option"); option.value = list[i]; option.text = list[i]; selectBox.appendChild(option);
-          }
+          const s = document.getElementById("kioskExercise"); s.innerHTML = "";
+          list.forEach(i => { const o = document.createElement("option"); o.value = i; o.text = i; s.appendChild(o); });
         }
         document.getElementById('globalRfidInput').focus();
       };
 
-      // --- 메인 탭 전환 ---
-      function switchMainTab(tab) {
-        currentMainTab = tab;
-        document.getElementById('basicModeArea').classList.add('hidden');
-        document.getElementById('gameModeArea').classList.add('hidden');
-        document.getElementById('btnBasic').classList.remove('active');
-        document.getElementById('btnGame').classList.remove('active');
-
-        if(tab === 'basic') {
-          document.getElementById('basicModeArea').classList.remove('hidden');
-          document.getElementById('btnBasic').classList.add('active');
-          changeBasicUI(); // 현재 선택된 서브메뉴 UI 적용
-        } else {
-          document.getElementById('gameModeArea').classList.remove('hidden');
-          document.getElementById('btnGame').classList.add('active');
-          changeGameUI();
-          statusDiv.innerHTML = "🎮 진행할 게임을 선택하고 시작을 눌러주세요.";
-        }
+      function switchMainTab(t) {
+        currentMainTab = t;
+        document.getElementById('basicModeArea').classList.toggle('hidden', t !== 'basic');
+        document.getElementById('gameModeArea').classList.toggle('hidden', t !== 'game');
+        document.getElementById('btnBasic').classList.toggle('active', t === 'basic');
+        document.getElementById('btnGame').classList.toggle('active', t === 'game');
+        t === 'basic' ? changeBasicUI() : changeGameUI();
       }
 
-      // --- 서브 메뉴 UI 전환 ---
       function changeBasicUI() {
         currentBasic = document.getElementById("basicSelect").value;
-        document.getElementById("basic1UI").classList.add("hidden"); document.getElementById("basic2UI").classList.add("hidden"); document.getElementById("basic3UI").classList.add("hidden");
-        document.getElementById("globalInputArea").classList.remove("hidden"); // 기본적으로 리더기 입력창 노출
-
-        if(currentBasic === "basic1") {
-          document.getElementById("basic1UI").classList.remove("hidden");
-          document.getElementById("globalRfidInput").focus();
-          statusDiv.innerHTML = "🏃 달리기(바퀴 수) 측정 대기 중...";
-        } else if(currentBasic === "basic2") {
-          document.getElementById("basic2UI").classList.remove("hidden");
-          document.getElementById("globalRfidInput").focus();
-          statusDiv.innerHTML = "⏱️ 결승선 타이머 모드 (시작을 눌러주세요)";
-        } else if(currentBasic === "basic3") {
-          document.getElementById("basic3UI").classList.remove("hidden");
-          document.getElementById("globalInputArea").classList.add("hidden"); // 수동 입력이므로 전역 리더기 숨김
-          statusDiv.innerHTML = "💪 자율 운동 기록 제출 대기 중...";
-        }
+        ["basic1UI", "basic2UI", "basic3UI"].forEach(id => document.getElementById(id).classList.add('hidden'));
+        document.getElementById(currentBasic + "UI").classList.remove('hidden');
+        document.getElementById('globalInputArea').classList.toggle('hidden', currentBasic === 'basic3');
+        statusDiv.innerHTML = "대기 중...";
       }
 
       function changeGameUI() {
         currentGame = document.getElementById("gameSelect").value;
-        document.getElementById("game1UI").classList.add("hidden"); document.getElementById("game2UI").classList.add("hidden"); document.getElementById("game3UI").classList.add("hidden");
-        document.getElementById("globalInputArea").classList.remove("hidden");
-        document.getElementById("globalRfidInput").focus();
-
-        if(currentGame === "game1") document.getElementById("game1UI").classList.remove("hidden");
-        else if(currentGame === "game2") document.getElementById("game2UI").classList.remove("hidden");
-        else if(currentGame === "game3") document.getElementById("game3UI").classList.remove("hidden");
+        ["game1UI", "game2UI", "game3UI", "game4UI", "game5UI"].forEach(id => document.getElementById(id).classList.add('hidden'));
+        document.getElementById(currentGame + "UI").classList.remove('hidden');
+        statusDiv.innerHTML = "게임을 선택하고 시작을 누르세요.";
       }
 
-      // --- 모달 로직 ---
       function openInfoModal() {
-        const info = gameInfoData[currentGame];
-        if(info) { document.getElementById('modalTitle').innerText = info.title; document.getElementById('modalBody').innerHTML = info.desc; document.getElementById('infoModal').classList.remove('hidden'); }
+        const i = gameInfoData[currentGame];
+        document.getElementById('modalTitle').innerHTML = i.title;
+        document.getElementById('modalBody').innerHTML = i.desc;
+        document.getElementById('infoModal').classList.remove('hidden');
       }
       function closeModal() { document.getElementById('infoModal').classList.add('hidden'); document.getElementById('globalRfidInput').focus(); }
 
-      // --- 기능 시작 / 종료 제어 ---
+      // 게임 로직 시작
+      function startGame() {
+        isGameRunning = true; document.getElementById('globalRfidInput').focus();
+        if(currentGame === "game1") { scoreBlue = 0; scoreRed = 0; game1TeamMap = {}; updateGame1UI(); }
+        else if(currentGame === "game2") { 
+          game2Survivors = {}; game2Zombies = new Set(); 
+          clearInterval(game2Interval); 
+          game2Interval = setInterval(() => {
+            const now = Date.now();
+            for(let t in game2Survivors) if(game2Survivors[t] < now) { game2Zombies.add(t); delete game2Survivors[t]; }
+            updateGame2UI();
+          }, 1000);
+        }
+        else if(currentGame === "game3") { game3Scores = {}; updateGame3UI(); }
+        else if(currentGame === "game4") {
+          game4StartTime = Date.now(); game4Laps = [];
+          clearInterval(game4Interval);
+          game4Interval = setInterval(() => {
+            let t = Date.now() - game4StartTime;
+            document.getElementById('game4Timer').innerText = "누적: " + formatTime(t);
+          }, 50);
+        }
+        else if(currentGame === "game5") { game5Total = 0; updateGame5UI(); }
+        statusDiv.innerHTML = "🏁 게임이 시작되었습니다!";
+      }
+
       function startBasic2() {
-        isBasic2Running = true; basic2StartTime = Date.now(); basic2Results = []; basic2Finished = new Set(); updateBasic2UI();
-        clearInterval(basic2Interval); document.getElementById('globalRfidInput').focus();
-        statusDiv.innerHTML = "🚦 결승선 타이머 가동 중! 태그를 스캔하세요!"; statusDiv.style.color = "var(--primary-dark)";
+        isBasic2Running = true; basic2StartTime = Date.now(); basic2Results = []; basic2Finished = new Set();
+        clearInterval(basic2Interval);
         basic2Interval = setInterval(() => {
-          if(!isBasic2Running) { clearInterval(basic2Interval); return; }
-          let t = Date.now() - basic2StartTime;
-          let m = String(Math.floor(t/60000)).padStart(2,'0'); let s = String(Math.floor((t%60000)/1000)).padStart(2,'0'); let ms = String(Math.floor((t%1000)/10)).padStart(2,'0');
-          document.getElementById('basic2Timer').innerText = `${m}:${s}.${ms}`;
+          document.getElementById('basic2Timer').innerText = formatTime(Date.now() - basic2StartTime);
         }, 50);
       }
 
-      function startGame() {
-        isGameRunning = true; document.getElementById('globalRfidInput').focus();
-        if(currentGame === "game1") {
-          scoreBlue = 0; scoreRed = 0; game1TeamMap = {}; game1Cooldowns = {}; document.getElementById('scoreBlue').innerText = scoreBlue; document.getElementById('scoreRed').innerText = scoreRed;
-          statusDiv.innerHTML = "🔥 진지 점령전이 시작되었습니다!";
-        } else if(currentGame === "game2") {
-          clearInterval(game2Interval); game2Survivors = {}; game2Zombies = new Set(); updateGame2UI();
-          statusDiv.innerHTML = "🧟 좀비 게임 시작! 백신을 접종하세요!";
-          game2Interval = setInterval(() => {
-            if(!isGameRunning) { clearInterval(game2Interval); return; }
-            const now = Date.now();
-            for(let tag in game2Survivors) { if(game2Survivors[tag] < now) { game2Zombies.add(tag); delete game2Survivors[tag]; statusDiv.innerHTML = `🚨 [${tag}] 좀비 감염!`; statusDiv.style.color = "#E53935"; } }
-            updateGame2UI();
-          }, 1000);
-        } else if(currentGame === "game3") {
-          game3Scores = {}; game3Cooldowns = {}; updateGame3UI(); statusDiv.innerHTML = "🏃‍♂️ 미션 랭킹전 시작! 태그를 찍으세요!";
-        }
-        statusDiv.style.color = "var(--primary-dark)";
-      }
-
       function endActivity(type) {
-        if(!confirm("진행 중인 기록이나 활동을 종료/초기화 하시겠습니까?")) return;
-        if(type === 'basic1') { 
-          for(let tag in activeTags) finishedTags.add(tag); activeTags = {}; statusDiv.innerHTML = "🛑 달리기(바퀴 수) 누적이 초기화 되었습니다."; 
-        } 
-        else if(type === 'basic2') { 
-          isBasic2Running = false; clearInterval(basic2Interval); statusDiv.innerHTML = "🛑 타이머가 정지되었습니다."; 
-        }
-        else if(type === 'game') { 
-          isGameRunning = false; if(typeof game2Interval !== 'undefined') clearInterval(game2Interval); statusDiv.innerHTML = "🛑 게임 활동이 종료되었습니다."; 
-        }
-        statusDiv.style.color = "#E53935"; document.activeElement.blur(); 
+        if(!confirm("초기화하시겠습니까?")) return;
+        if(type==='basic2') { isBasic2Running = false; clearInterval(basic2Interval); }
+        else if(type==='game') { isGameRunning = false; clearInterval(game2Interval); clearInterval(game4Interval); }
+        statusDiv.innerHTML = "🛑 종료되었습니다.";
       }
 
-      // --- 중앙 집중식 RFID 입력 처리기 ---
-      document.getElementById("globalRfidInput").addEventListener("keypress", async function(event) {
-        if (event.key === "Enter") {
-          event.preventDefault(); var tagId = this.value.trim(); this.value = ""; if(tagId === "") return;
+      function formatTime(t) {
+        let m = String(Math.floor(t/60000)).padStart(2,'0'), s = String(Math.floor((t%60000)/1000)).padStart(2,'0'), ms = String(Math.floor((t%1000)/10)).padStart(2,'0');
+        return `${m}:${s}.${ms}`;
+      }
+
+      // RFID 입력 핵심 처리
+      document.getElementById("globalRfidInput").addEventListener("keypress", async function(e) {
+        if (e.key === "Enter") {
+          let tagId = this.value.trim(); this.value = ""; if(!tagId) return;
           const now = Date.now();
 
-          // [1] 측정 및 기록 모드일 때
-          if (currentMainTab === 'basic') {
-            if (currentBasic === "basic1") {
-              if (finishedTags.has(tagId)) return;
-              if (activeTags[tagId] && (now - activeTags[tagId] > 600000)) { finishedTags.add(tagId); delete activeTags[tagId]; return; }
-              if (activeTags[tagId] && (now - activeTags[tagId] < 10000)) return; 
-              activeTags[tagId] = now; statusDiv.innerHTML = "⏳ " + tagId + " 바퀴 수 업데이트 중..."; 
-              const resultMsg = await callGoogleScript('recordRfidRun', [tagId]);
-              if(resultMsg) { statusDiv.innerHTML = resultMsg; }
-            } 
-            else if (currentBasic === "basic2") {
-              if(!isBasic2Running) return;
-              if (basic2Finished.has(tagId)) { statusDiv.innerHTML = `⚠️ [${tagId}] 이미 통과했습니다!`; statusDiv.style.color = "#E53935"; return; }
-              let elapsed = now - basic2StartTime; basic2Finished.add(tagId); basic2Results.push({ tag: tagId, time: elapsed });
-              statusDiv.innerHTML = `🏁 [${tagId}] 결승선 통과!`; statusDiv.style.color = "#0288D1"; updateBasic2UI();
+          if(currentMainTab === 'basic') {
+            if(currentBasic === 'basic1') {
+              if(finishedTags.has(tagId)) return;
+              if(activeTags[tagId] && (now - activeTags[tagId] < 10000)) return;
+              activeTags[tagId] = now;
+              const res = await callGoogleScript('recordRfidRun', [tagId]);
+              if(res) statusDiv.innerHTML = res;
+            } else if(currentBasic === 'basic2' && isBasic2Running) {
+              if(basic2Finished.has(tagId)) return;
+              basic2Finished.add(tagId); basic2Results.push({tag:tagId, time: now - basic2StartTime});
+              updateBasic2UI();
             }
-          } 
-          // [2] 게임 모드일 때
-          else if (currentMainTab === 'game') {
-            if(!isGameRunning) return;
-            if(currentGame === "game1") {
-              if (game1Cooldowns[tagId] && (now - game1Cooldowns[tagId] < 5000)) { statusDiv.innerHTML = `⚠️ 5초 쿨타임!`; return; }
-              if (!game1TeamMap[tagId]) game1TeamMap[tagId] = (Object.keys(game1TeamMap).length % 2 === 0) ? "blue" : "red"; 
-              game1Cooldowns[tagId] = now; const myTeam = game1TeamMap[tagId];
-              if (myTeam === "blue") { scoreBlue++; document.getElementById('scoreBlue').innerText = scoreBlue; statusDiv.innerHTML = `🔵 청팀 득점!`; statusDiv.style.color = "var(--blue-team)"; } 
-              else { scoreRed++; document.getElementById('scoreRed').innerText = scoreRed; statusDiv.innerHTML = `🔴 백팀 득점!`; statusDiv.style.color = "var(--red-team)"; }
-            } 
-            else if(currentGame === "game2") {
-              if(game2Zombies.has(tagId)) { statusDiv.innerHTML = `🧟 [${tagId}] 이미 좀비입니다!`; return; }
-              game2Survivors[tagId] = now + SURVIVAL_TIME; statusDiv.innerHTML = `💉 [${tagId}] 백신 투여 완료!`; statusDiv.style.color = "#4CAF50"; updateGame2UI();
-            }
-            else if(currentGame === "game3") {
-              if (game3Cooldowns[tagId] && (now - game3Cooldowns[tagId] < 10000)) { statusDiv.innerHTML = `⚠️ [${tagId}] 미션을 더 수행하세요!`; return; }
-              game3Cooldowns[tagId] = now; if(!game3Scores[tagId]) game3Scores[tagId] = 0; game3Scores[tagId]++;
-              statusDiv.innerHTML = `✨ [${tagId}] 랭킹 스택 +1 추가!`; statusDiv.style.color = "#F57C00"; updateGame3UI();
+          } else if(isGameRunning) {
+            if(currentGame === 'game1') {
+              if(game1Cooldowns[tagId] && now - game1Cooldowns[tagId] < 5000) return;
+              if(!game1TeamMap[tagId]) game1TeamMap[tagId] = Object.keys(game1TeamMap).length % 2 === 0 ? "blue" : "red";
+              game1TeamMap[tagId] === "blue" ? scoreBlue++ : scoreRed++;
+              game1Cooldowns[tagId] = now; updateGame1UI();
+            } else if(currentGame === 'game2') {
+              if(game2Zombies.has(tagId)) return;
+              game2Survivors[tagId] = now + 180000; updateGame2UI();
+            } else if(currentGame === 'game3') {
+              if(game3Cooldowns[tagId] && now - game3Cooldowns[tagId] < 10000) return;
+              game3Scores[tagId] = (game3Scores[tagId] || 0) + 1;
+              game3Cooldowns[tagId] = now; updateGame3UI();
+            } else if(currentGame === 'game4') {
+              let lastTime = game4Laps.length > 0 ? game4Laps[game4Laps.length-1].total : 0;
+              let lapTime = now - (game4StartTime + lastTime);
+              game4Laps.push({tag: tagId, lap: lapTime, total: now - game4StartTime});
+              updateGame4UI();
+            } else if(currentGame === 'game5') {
+              game5Total++; updateGame5UI();
             }
           }
         }
       });
 
-      // --- 화면 갱신 엔진 ---
+      // UI 갱신 함수들
       function updateBasic2UI() {
-        const rankingDiv = document.getElementById("basic2Ranking");
-        if(basic2Results.length === 0) return;
-        basic2Results.sort((a, b) => a.time - b.time); // 시간 오름차순
-        let rHTML = "";
-        basic2Results.forEach((item, index) => {
-          let t = item.time; let m = String(Math.floor(t/60000)).padStart(2,'0'); let s = String(Math.floor((t%60000)/1000)).padStart(2,'0'); let ms = String(Math.floor((t%1000)/10)).padStart(2,'0');
-          let rankClass = ""; let rankIcon = `${index + 1}등`;
-          if(index === 0) { rankClass = "rank-1"; rankIcon = "🥇 1등"; } else if(index === 1) { rankClass = "rank-2"; rankIcon = "🥈 2등"; } else if(index === 2) { rankClass = "rank-3"; rankIcon = "🥉 3등"; }
-          rHTML += `<div class="rank-item ${rankClass}"><span>${rankIcon} - ${item.tag}</span><span class="rank-time">${m}:${s}.${ms}</span></div>`;
-        });
-        rankingDiv.innerHTML = rHTML;
+        let r = document.getElementById("basic2Ranking");
+        basic2Results.sort((a,b)=>a.time-b.time);
+        r.innerHTML = basic2Results.map((i,idx)=>`<div class="rank-item"><span>${idx+1}등 - ${i.tag}</span><span>${formatTime(i.time)}</span></div>`).join('');
       }
-
+      function updateGame1UI() {
+        document.getElementById('scoreBlue').innerText = scoreBlue; document.getElementById('scoreRed').innerText = scoreRed;
+      }
       function updateGame2UI() {
-        const survivorDiv = document.getElementById("survivorList"); const zombieDiv = document.getElementById("zombieList"); const now = Date.now();
-        let sHTML = "";
-        for(let tag in game2Survivors) {
-          const timeLeftStr = Math.max(0, Math.ceil((game2Survivors[tag] - now) / 1000));
-          const mins = String(Math.floor(timeLeftStr / 60)).padStart(2, '0'); const secs = String(timeLeftStr % 60).padStart(2, '0');
-          let timerClass = ""; if(timeLeftStr <= 30) timerClass = "timer-danger"; else if(timeLeftStr <= 60) timerClass = "timer-warn";
-          sHTML += `<span class="badge-survivor">${tag} <span class="${timerClass}">⏳ ${mins}:${secs}</span></span>`;
-        }
-        survivorDiv.innerHTML = sHTML || "백신 대기 중...";
-        let zHTML = ""; game2Zombies.forEach(tag => { zHTML += `<span class="badge-zombie">🧟 ${tag}</span>`; });
-        zombieDiv.innerHTML = zHTML || "아직 감염자가 없습니다.";
+        const now = Date.now();
+        document.getElementById('survivorList').innerHTML = Object.entries(game2Survivors).map(([t,v])=>{
+          let left = Math.ceil((v-now)/1000);
+          return `<span style="padding:5px; border-radius:5px; background:#e8f5e9; margin:3px; display:inline-block;">${t} (${left}s)</span>`;
+        }).join('');
+        document.getElementById('zombieList').innerHTML = "🧟 좀비: " + Array.from(game2Zombies).join(', ');
       }
-
       function updateGame3UI() {
-        const rankingDiv = document.getElementById("rankingList");
-        const sortedArray = Object.entries(game3Scores).sort((a, b) => b[1] - a[1]);
-        if(sortedArray.length === 0) return;
-        let rHTML = "";
-        sortedArray.forEach((item, index) => {
-          const tag = item[0]; const score = item[1];
-          let rankClass = ""; let rankIcon = `${index + 1}등`;
-          if(index === 0) { rankClass = "rank-1"; rankIcon = "🥇 1등"; } else if(index === 1) { rankClass = "rank-2"; rankIcon = "🥈 2등"; } else if(index === 2) { rankClass = "rank-3"; rankIcon = "🥉 3등"; }
-          rHTML += `<div class="rank-item ${rankClass}"><span>${rankIcon} - ${tag}</span><span class="rank-score">${score} 스택</span></div>`;
-        });
-        rankingDiv.innerHTML = rHTML;
+        let sorted = Object.entries(game3Scores).sort((a,b)=>b[1]-a[1]);
+        document.getElementById('rankingList').innerHTML = sorted.map((i,idx)=>`<div class="rank-item ${idx===0?'rank-1':''}"><span>${idx+1}등 - ${i[0]}</span><span>${i[1]} 스택</span></div>`).join('');
       }
-
-      // --- 자율 운동 기록 제출 로직 (Basic 3) ---
+      function updateGame4UI() {
+        document.getElementById('lapList').innerHTML = game4Laps.slice().reverse().map((i,idx)=>`<div class="lap-item"><span>${game4Laps.length-idx}번 주자(${i.tag})</span><span>+${formatTime(i.lap)}</span></div>`).join('');
+      }
+      function updateGame5UI() {
+        let target = parseInt(document.getElementById('coopTarget').value) || 100;
+        let percent = Math.min(100, (game5Total / target) * 100);
+        document.getElementById('progressFill').style.width = percent + "%";
+        document.getElementById('progressText').innerText = `${game5Total} / ${target}`;
+        if(game5Total >= target) { statusDiv.innerHTML = "🎊 축하합니다! 목표 에너지를 모두 모았습니다! 🎊"; statusDiv.style.color="orange"; }
+      }
       async function submitKiosk() {
-        var tagId = document.getElementById("kioskTag").value.trim(); var exercise = document.getElementById("kioskExercise").value; var score = document.getElementById("kioskScore").value.trim();
-        if(tagId === "" || score === "") { alert("입력칸을 채워주세요."); return; } 
-        document.getElementById("submitBtn").disabled = true; 
-        
-        statusDiv.innerHTML = "⏳ 전송 중..."; const resultMsg = await callGoogleScript('recordKioskExercise', [tagId, exercise, score]);
-        if(resultMsg) { 
-          statusDiv.innerHTML = resultMsg; document.getElementById("kioskTag").value = ""; document.getElementById("kioskScore").value = ""; 
-          // 제출 완료 후 다시 기본 달리기 측정 화면으로 복귀
-          setTimeout(() => { document.getElementById("basicSelect").value = "basic1"; changeBasicUI(); }, 2000); 
-        }
-        document.getElementById("submitBtn").disabled = false;
+        let t = document.getElementById('kioskTag').value, e = document.getElementById('kioskExercise').value, s = document.getElementById('kioskScore').value;
+        if(!t || !s) return;
+        const res = await callGoogleScript('recordKioskExercise', [t,e,s]);
+        if(res) { alert(res); document.getElementById('kioskScore').value=""; }
       }
     </script>
   </body>
