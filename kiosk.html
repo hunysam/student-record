@@ -64,7 +64,7 @@
       .timer-danger { color: #ff5252; animation: blink 1s infinite; }
       @keyframes blink { 50% { opacity: 0.5; } }
 
-      /* 게임 3: 랭킹 리스트 */
+      /* 게임 3, 4: 랭킹 리스트 */
       .ranking-area { background: #fff; border: 2px solid var(--border-color); border-radius: 12px; padding: 15px; max-height: 300px; overflow-y: auto; text-align: left; }
       .rank-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #eee; font-size: 18px; font-weight: bold; align-items: center;}
       .rank-item:last-child { border-bottom: none; }
@@ -72,6 +72,10 @@
       .rank-2 { background-color: rgba(192, 192, 192, 0.1); color: #708090; }
       .rank-3 { background-color: rgba(205, 127, 50, 0.1); color: #8B4513; }
       .rank-score { background: var(--primary-color); color: white; padding: 5px 12px; border-radius: 15px; font-size: 16px; }
+      .rank-time { background: #0288D1; color: white; padding: 5px 12px; border-radius: 15px; font-size: 16px; font-family: monospace;}
+      
+      /* 게임 4: 라이브 타이머 */
+      .live-timer { font-size: 45px; font-weight: 900; color: var(--primary-dark); margin: 15px 0; font-family: monospace;}
     </style>
   </head>
   <body>
@@ -118,7 +122,7 @@
               <option value="game1">1. 진지 점령전 (청백전)</option>
               <option value="game2">2. 좀비 생존 게임 (백신 스테이션)</option>
               <option value="game3">3. 미션 랭킹전 (런닝맨)</option>
-              <option value="game4" disabled>4. 무궁화 꽃이 (준비중)</option>
+              <option value="game4">4. 무궁화 꽃이 피었습니다 (초정밀 타이머)</option>
             </select>
           </div>
 
@@ -156,6 +160,14 @@
               <div style="color:var(--text-sub); text-align:center; padding:20px;">게임을 시작하고 태그를 찍어주세요!</div>
             </div>
           </div>
+
+          <div id="game4UI" class="hidden">
+            <h4 style="text-align:left; color:var(--primary-dark); margin-top:0;">⏱️ 초정밀 결승선 라이브 타이머</h4>
+            <div class="live-timer" id="game4Timer">00:00.00</div>
+            <div class="ranking-area" id="game4Ranking">
+              <div style="color:var(--text-sub); text-align:center; padding:20px;">결승선 대기 중...</div>
+            </div>
+          </div>
           
         </div>
 
@@ -176,7 +188,8 @@
       const gameInfoData = {
         "game1": { title: "🔵🔴 1. 진지 점령전 (청백전)", desc: "<b>[팀 자동 배정]</b><br>처음 태그를 찍는 순서대로 청팀과 백팀에 번갈아가며 자동 배정됩니다.<br><br><b>[규칙]</b><br>태그를 찍을 때마다 자기 팀의 점수가 1점씩 올라갑니다. 제한 시간 동안 고지(리더기)를 더 많이 차지한 팀이 승리합니다.<br><br><span style='color:red;'>※ 꼼수 방지:</span> 한 번 찍으면 5초 동안은 연속으로 점수를 획득할 수 없습니다." },
         "game2": { title: "🧟‍♂️ 2. 좀비 생존 게임", desc: "<b>[생존자 등록 및 백신]</b><br>게임을 시작하고 리더기를 찍으면 '생존자'로 등록되며 3분의 생존 타이머가 시작됩니다.<br><br><b>[규칙]</b><br>생존자는 타이머가 0초가 되기 전에 리더기로 도망쳐와서 다시 백신(태그)을 맞아야 생존 시간이 3분으로 리셋됩니다. 시간 내에 찍지 못하면 <b>좀비</b>로 변이됩니다!" },
-        "game3": { title: "🏃‍♂️ 3. 미션 랭킹전 (런닝맨)", desc: "<b>[개인전 랭킹 스택 게임]</b><br>체육관 곳곳에 숨겨진 미션을 수행하고 돌아와서 리더기에 태그를 찍어 인증(스택 추가)하세요!<br><br><b>[규칙]</b><br>태그를 찍을 때마다 미션 수행 횟수가 1씩 올라가며, 전광판에 <b>실시간 1~꼴등 랭킹</b>이 자동 반영됩니다.<br><br><span style='color:red;'>※ 꼼수 방지:</span> 미션을 수행할 시간을 주기 위해 한 번 찍으면 10초 동안은 다시 찍을 수 없습니다." }
+        "game3": { title: "🏃‍♂️ 3. 미션 랭킹전 (런닝맨)", desc: "<b>[개인전 랭킹 스택 게임]</b><br>체육관 곳곳에 숨겨진 미션을 수행하고 돌아와서 리더기에 태그를 찍어 인증(스택 추가)하세요!<br><br><b>[규칙]</b><br>태그를 찍을 때마다 미션 수행 횟수가 1씩 올라가며, 전광판에 <b>실시간 1~꼴등 랭킹</b>이 자동 반영됩니다.<br><br><span style='color:red;'>※ 꼼수 방지:</span> 미션을 수행할 시간을 주기 위해 한 번 찍으면 10초 동안은 다시 찍을 수 없습니다." },
+        "game4": { title: "🚦 4. 무궁화 꽃이 피었습니다", desc: "<b>[초정밀 결승선 통과 게임]</b><br>선생님이 결승선(리더기)에 서서 전통 놀이를 진행합니다. 달리기 경주 등에도 활용 가능합니다.<br><br><b>[규칙]</b><br>게임을 시작하면 라이브 타이머가 작동합니다. 학생들이 결승선을 통과(태그 인식)하면, 0.01초 단위로 정확한 통과 시간이 기록되며 순위가 매겨집니다.<br><br><span style='color:red;'>※ 주의:</span> 한 번 결승선을 통과한 학생은 해당 게임에서는 다시 기록되지 않습니다." }
       };
 
       // 게임 1 변수
@@ -187,8 +200,10 @@
       const SURVIVAL_TIME = 180000; // 3분
 
       // 게임 3 변수
-      let game3Scores = {}; // {"TAG001": 5, "TAG002": 3}
-      let game3Cooldowns = {}; // 10초 쿨타임 관리
+      let game3Scores = {}; let game3Cooldowns = {};
+
+      // 게임 4 변수
+      let game4StartTime = 0; let game4Results = []; let game4Finished = new Set(); let game4Interval;
 
       // --- 구글 통신 ---
       async function callGoogleScript(actionName, argsArray = []) {
@@ -222,10 +237,13 @@
 
       function changeGameUI() {
         currentGame = document.getElementById("gameSelect").value;
-        document.getElementById("game1UI").classList.add("hidden"); document.getElementById("game2UI").classList.add("hidden"); document.getElementById("game3UI").classList.add("hidden");
+        document.getElementById("game1UI").classList.add("hidden"); document.getElementById("game2UI").classList.add("hidden"); 
+        document.getElementById("game3UI").classList.add("hidden"); document.getElementById("game4UI").classList.add("hidden");
+        
         if(currentGame === "game1") document.getElementById("game1UI").classList.remove("hidden");
         else if(currentGame === "game2") document.getElementById("game2UI").classList.remove("hidden");
         else if(currentGame === "game3") document.getElementById("game3UI").classList.remove("hidden");
+        else if(currentGame === "game4") document.getElementById("game4UI").classList.remove("hidden");
       }
 
       // --- 모달 로직 ---
@@ -252,6 +270,7 @@
           clearInterval(game2Interval); game2Survivors = {}; game2Zombies = new Set(); updateGame2UI();
           statusDiv.innerHTML = "🧟 좀비 게임 시작! 태그를 스캔하여 생존자로 등록하세요!";
           game2Interval = setInterval(() => {
+            if(!isGameRunning) { clearInterval(game2Interval); return; }
             const now = Date.now();
             for(let tag in game2Survivors) { if(game2Survivors[tag] < now) { game2Zombies.add(tag); delete game2Survivors[tag]; statusDiv.innerHTML = `🚨 삐빅! [${tag}] 학생이 좀비가 되었습니다!`; statusDiv.style.color = "#E53935"; } }
             updateGame2UI();
@@ -259,6 +278,20 @@
         } else if(currentGame === "game3") {
           game3Scores = {}; game3Cooldowns = {}; updateGame3UI();
           statusDiv.innerHTML = "🏃‍♂️ 미션 랭킹전 시작! 미션을 수행하고 태그를 찍으세요!";
+        } else if(currentGame === "game4") {
+          game4StartTime = Date.now(); game4Results = []; game4Finished = new Set(); updateGame4UI();
+          clearInterval(game4Interval);
+          statusDiv.innerHTML = "🚦 결승선 타이머 시작! 어서 들어오세요!";
+          
+          // 0.05초(50ms)마다 타이머 갱신 (마이크로초 느낌 연출)
+          game4Interval = setInterval(() => {
+            if(!isGameRunning) { clearInterval(game4Interval); return; }
+            let t = Date.now() - game4StartTime;
+            let m = String(Math.floor(t/60000)).padStart(2,'0');
+            let s = String(Math.floor((t%60000)/1000)).padStart(2,'0');
+            let ms = String(Math.floor((t%1000)/10)).padStart(2,'0'); // 소수점 둘째자리까지
+            document.getElementById('game4Timer').innerText = `${m}:${s}.${ms}`;
+          }, 50);
         }
         statusDiv.style.color = "var(--primary-dark)";
       }
@@ -267,7 +300,12 @@
       function endCurrentActivity(type) {
         if(!confirm("현재 활동을 종료하시겠습니까?")) return;
         if(type === 'run') { for(let tag in activeTags) finishedTags.add(tag); activeTags = {}; statusDiv.innerHTML = "🛑 달리기 활동 종료."; } 
-        else if(type === 'game') { isGameRunning = false; clearInterval(game2Interval); statusDiv.innerHTML = "🛑 게임이 종료되었습니다!"; }
+        else if(type === 'game') { 
+          isGameRunning = false; 
+          if(typeof game2Interval !== 'undefined') clearInterval(game2Interval); 
+          if(typeof game4Interval !== 'undefined') clearInterval(game4Interval); 
+          statusDiv.innerHTML = "🛑 게임이 종료되었습니다!"; 
+        }
         statusDiv.style.color = "#E53935"; document.activeElement.blur(); 
       }
 
@@ -300,6 +338,17 @@
             statusDiv.innerHTML = `✨ [${tagId}] 랭킹 스택 +1 추가!`; statusDiv.style.color = "#F57C00";
             updateGame3UI();
           }
+          else if(currentGame === "game4") {
+            if (game4Finished.has(tagId)) { 
+              statusDiv.innerHTML = `⚠️ [${tagId}] 이미 결승선을 통과했습니다!`; statusDiv.style.color = "#E53935"; return; 
+            }
+            // 통과한 순간의 정확한 시간(ms) 계산
+            let elapsed = now - game4StartTime;
+            game4Finished.add(tagId);
+            game4Results.push({ tag: tagId, time: elapsed });
+            statusDiv.innerHTML = `🏁 [${tagId}] 결승선 통과 완료!`; statusDiv.style.color = "#0288D1";
+            updateGame4UI();
+          }
         }
       });
 
@@ -320,25 +369,37 @@
 
       function updateGame3UI() {
         const rankingDiv = document.getElementById("rankingList");
-        // 점수를 기준으로 내림차순 정렬 배열 생성
         const sortedArray = Object.entries(game3Scores).sort((a, b) => b[1] - a[1]);
-        
         if(sortedArray.length === 0) { rankingDiv.innerHTML = "<div style='text-align:center; padding:20px;'>아직 기록이 없습니다.</div>"; return; }
-
         let rHTML = "";
         sortedArray.forEach((item, index) => {
           const tag = item[0]; const score = item[1];
           let rankClass = ""; let rankIcon = `${index + 1}등`;
-          if(index === 0) { rankClass = "rank-1"; rankIcon = "🥇 1등"; }
-          else if(index === 1) { rankClass = "rank-2"; rankIcon = "🥈 2등"; }
-          else if(index === 2) { rankClass = "rank-3"; rankIcon = "🥉 3등"; }
+          if(index === 0) { rankClass = "rank-1"; rankIcon = "🥇 1등"; } else if(index === 1) { rankClass = "rank-2"; rankIcon = "🥈 2등"; } else if(index === 2) { rankClass = "rank-3"; rankIcon = "🥉 3등"; }
+          rHTML += `<div class="rank-item ${rankClass}"><span>${rankIcon} - ${tag}</span><span class="rank-score">${score} 스택</span></div>`;
+        });
+        rankingDiv.innerHTML = rHTML;
+      }
 
-          rHTML += `
-            <div class="rank-item ${rankClass}">
-              <span>${rankIcon} - ${tag}</span>
-              <span class="rank-score">${score} 스택</span>
-            </div>
-          `;
+      function updateGame4UI() {
+        const rankingDiv = document.getElementById("game4Ranking");
+        if(game4Results.length === 0) { rankingDiv.innerHTML = "<div style='text-align:center; padding:20px;'>결승선 통과 대기 중...</div>"; return; }
+        
+        // 시간순(오름차순) 정렬
+        game4Results.sort((a, b) => a.time - b.time);
+        
+        let rHTML = "";
+        game4Results.forEach((item, index) => {
+          let t = item.time;
+          let m = String(Math.floor(t/60000)).padStart(2,'0');
+          let s = String(Math.floor((t%60000)/1000)).padStart(2,'0');
+          let ms = String(Math.floor((t%1000)/10)).padStart(2,'0');
+          let timeStr = `${m}:${s}.${ms}`;
+          
+          let rankClass = ""; let rankIcon = `${index + 1}등`;
+          if(index === 0) { rankClass = "rank-1"; rankIcon = "🥇 1등"; } else if(index === 1) { rankClass = "rank-2"; rankIcon = "🥈 2등"; } else if(index === 2) { rankClass = "rank-3"; rankIcon = "🥉 3등"; }
+          
+          rHTML += `<div class="rank-item ${rankClass}"><span>${rankIcon} - ${item.tag}</span><span class="rank-time">${timeStr}</span></div>`;
         });
         rankingDiv.innerHTML = rHTML;
       }
