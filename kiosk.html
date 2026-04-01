@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>스마트 체육 키오스크</title>
     <style>
-      /* --- [디자인 테마 설정] --- */
+      /* (CSS는 이전과 동일하게 유지 - 스크롤 압박을 줄이기 위해 생략 없이 넣습니다) */
       :root {
-        --primary-color: #4CAF50; /* 메인 색상 (기존 디자인에 맞춰 파란색이 필요하면 #2196F3 으로 변경하세요) */
+        --primary-color: #4CAF50; 
         --primary-dark: #388E3C;
         --bg-color: #f4f7f6;
         --card-bg: #ffffff;
@@ -16,139 +16,19 @@
         --border-color: #e0e0e0;
         --radius: 12px;
       }
-
-      /* --- [전체 레이아웃] --- */
-      body { 
-        font-family: 'Pretendard', 'Malgun Gothic', sans-serif; 
-        background-color: var(--bg-color); 
-        margin: 0; 
-        padding: 20px; 
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        box-sizing: border-box;
-      }
-
-      .container { 
-        width: 100%;
-        max-width: 600px; /* 태블릿 화면에 최적화된 너비 */
-        background: var(--card-bg); 
-        border-radius: var(--radius); 
-        box-shadow: 0 8px 20px rgba(0,0,0,0.08); 
-        overflow: hidden;
-        text-align: center;
-      }
-
-      /* --- [헤더 디자인] --- */
-      .header {
-        background-color: var(--primary-color);
-        color: white;
-        padding: 20px 0;
-        font-size: 24px;
-        font-weight: bold;
-        letter-spacing: 1px;
-      }
-
-      .content-area {
-        padding: 30px;
-      }
-
-      /* --- [탭 버튼 디자인] --- */
-      .tab-container {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-bottom: 25px;
-      }
-
-      .tab-btn { 
-        flex: 1;
-        padding: 15px 10px; 
-        font-size: 16px; 
-        cursor: pointer; 
-        border: 2px solid var(--border-color); 
-        border-radius: var(--radius); 
-        background-color: var(--card-bg); 
-        color: var(--text-sub);
-        font-weight: bold;
-        transition: all 0.3s ease;
-      }
-
-      .tab-btn.active { 
-        background-color: rgba(76, 175, 80, 0.1); /* primary-color의 연한 버전 */
-        border-color: var(--primary-color);
-        color: var(--primary-color);
-      }
-
-      /* --- [입력 폼 디자인] --- */
-      .input-group {
-        margin-bottom: 20px;
-        text-align: left;
-      }
-
-      .input-group label {
-        display: block;
-        font-size: 14px;
-        color: var(--text-sub);
-        margin-bottom: 8px;
-        font-weight: bold;
-      }
-
-      input, select { 
-        width: 100%; 
-        font-size: 18px; 
-        padding: 15px; 
-        border: 1px solid var(--border-color); 
-        border-radius: 8px; 
-        box-sizing: border-box;
-        transition: border-color 0.3s;
-        background-color: #fafafa;
-      }
-
-      input:focus, select:focus {
-        outline: none;
-        border-color: var(--primary-color);
-        background-color: #fff;
-      }
-
-      /* --- [제출 버튼 디자인] --- */
-      button.submit-btn { 
-        width: 100%;
-        font-size: 20px; 
-        font-weight: bold;
-        padding: 16px; 
-        background-color: var(--primary-color); 
-        color: white; 
-        border: none; 
-        border-radius: 8px; 
-        cursor: pointer; 
-        margin-top: 10px; 
-        transition: background-color 0.3s;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      }
-
-      button.submit-btn:hover {
-        background-color: var(--primary-dark);
-      }
-
-      button.submit-btn:disabled {
-        background-color: #ccc;
-        cursor: not-allowed;
-      }
-
-      /* --- [상태 메시지] --- */
-      #status { 
-        margin-top: 25px; 
-        font-size: 20px; 
-        font-weight: bold; 
-        min-height: 30px; 
-        padding: 15px;
-        border-radius: 8px;
-        background-color: #f9f9f9;
-        color: var(--text-main);
-      }
-
+      body { font-family: 'Pretendard', 'Malgun Gothic', sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; }
+      .container { width: 100%; max-width: 600px; background: var(--card-bg); border-radius: var(--radius); box-shadow: 0 8px 20px rgba(0,0,0,0.08); overflow: hidden; text-align: center; }
+      .header { background-color: var(--primary-color); color: white; padding: 20px 0; font-size: 24px; font-weight: bold; }
+      .content-area { padding: 30px; }
+      .tab-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
+      .tab-btn { flex: 1; padding: 15px 5px; font-size: 15px; cursor: pointer; border: 2px solid var(--border-color); border-radius: var(--radius); background-color: var(--card-bg); color: var(--text-sub); font-weight: bold; transition: all 0.3s ease; }
+      .tab-btn.active { background-color: rgba(76, 175, 80, 0.1); border-color: var(--primary-color); color: var(--primary-color); }
+      .input-group { margin-bottom: 20px; text-align: left; }
+      .input-group label { display: block; font-size: 14px; color: var(--text-sub); margin-bottom: 8px; font-weight: bold; }
+      input, select { width: 100%; font-size: 18px; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: #fafafa; }
+      input:focus, select:focus { outline: none; border-color: var(--primary-color); background-color: #fff; }
+      button.submit-btn { width: 100%; font-size: 20px; font-weight: bold; padding: 16px; background-color: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; }
+      #status { margin-top: 25px; font-size: 20px; font-weight: bold; min-height: 30px; padding: 15px; border-radius: 8px; background-color: #f9f9f9; color: var(--text-main); }
       .hidden { display: none !important; }
       .desc-text { color: var(--text-sub); font-size: 15px; margin-bottom: 20px; }
     </style>
@@ -159,35 +39,30 @@
       
       <div class="content-area">
         <div class="tab-container">
-          <button id="btnRun" class="tab-btn active" onclick="switchTab('run')">🏃 달리기 (자동)</button>
-          <button id="btnKiosk" class="tab-btn" onclick="switchTab('kiosk')">💪 자율 기록 (수동)</button>
+          <button id="btnStandby" class="tab-btn active" onclick="switchTab('standby')">⏸️ 대기 (종료)</button>
+          <button id="btnRun" class="tab-btn" onclick="switchTab('run')">🏃 달리기 시작</button>
+          <button id="btnKiosk" class="tab-btn" onclick="switchTab('kiosk')">💪 자율 기록</button>
         </div>
 
-        <div id="runMode">
+        <div id="standbyMode">
+          <p class="desc-text" style="font-size: 18px; color: var(--primary-dark); font-weight: bold;">
+            현재 기록 측정이 중지된 대기 상태입니다.<br><br>
+            측정을 원하시면 위 메뉴를 선택해주세요.
+          </p>
+        </div>
+
+        <div id="runMode" class="hidden">
           <p class="desc-text">리더기 앞을 지나가면 자동으로 기록됩니다.</p>
           <div class="input-group">
-            <input type="text" id="rfidInput" placeholder="태그 자동 입력 대기중..." autofocus>
+            <input type="text" id="rfidInput" placeholder="태그 자동 입력 대기중...">
           </div>
         </div>
 
         <div id="kioskMode" class="hidden">
           <p class="desc-text">자신의 태그 번호와 기록을 직접 입력하세요.</p>
-          
-          <div class="input-group">
-            <label>태그 번호</label>
-            <input type="text" id="kioskTag" placeholder="본인 태그 번호 (예: TAG001)">
-          </div>
-          
-          <div class="input-group">
-            <label>운동 종목</label>
-            <select id="kioskExercise"><option>로딩 중...</option></select>
-          </div>
-          
-          <div class="input-group">
-            <label>오늘의 기록</label>
-            <input type="number" id="kioskScore" placeholder="기록 (숫자만 입력)">
-          </div>
-          
+          <div class="input-group"><label>태그 번호</label><input type="text" id="kioskTag" placeholder="본인 태그 번호 (예: TAG001)"></div>
+          <div class="input-group"><label>운동 종목</label><select id="kioskExercise"><option>로딩 중...</option></select></div>
+          <div class="input-group"><label>오늘의 기록</label><input type="number" id="kioskScore" placeholder="기록 (숫자만 입력)"></div>
           <button class="submit-btn" id="submitBtn" onclick="submitKiosk()">기록 제출하기</button>
         </div>
 
@@ -196,27 +71,18 @@
     </div>
 
     <script>
-      // 🚨 [매우 중요] 아래 따옴표 안에 선생님의 구글 앱스 스크립트 웹앱 주소(exec)를 꼭 넣으세요!
-      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyut1CvhMzwvgeIXZ1ZpZoLOrFrndZCDJ5dXehA8WA0VZ-VUdxHn_AYPy7pzDn1DupE/exec";
-
+      const SCRIPT_URL = "여기에_선생님의_구글웹앱_EXEC_주소_입력";
       var statusDiv = document.getElementById("status");
+      let idleTimer; // 30초 대기 타이머 변수
 
-      // 구글 서버와 통신하는 공통 함수
       async function callGoogleScript(actionName, argsArray = []) {
         try {
-          const response = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify({ action: actionName, args: argsArray })
-          });
+          const response = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: actionName, args: argsArray }) });
           const result = await response.json();
           if (!result.success) throw new Error(result.error);
           return result.data;
         } catch (error) {
-          statusDiv.innerHTML = "⚠️ 서버 통신 오류 발생";
-          statusDiv.style.color = "#E53935";
-          console.error(error);
-          return null;
+          statusDiv.innerHTML = "⚠️ 서버 통신 오류 발생"; statusDiv.style.color = "#E53935"; return null;
         }
       }
 
@@ -226,32 +92,57 @@
           var selectBox = document.getElementById("kioskExercise");
           selectBox.innerHTML = "";
           for(var i = 0; i < list.length; i++) {
-            var option = document.createElement("option");
-            option.value = list[i]; option.text = list[i];
-            selectBox.appendChild(option);
+            var option = document.createElement("option"); option.value = list[i]; option.text = list[i]; selectBox.appendChild(option);
           }
         }
+        resetIdleTimer(); // 초기 타이머 가동
       };
 
       function switchTab(mode) {
+        document.getElementById('standbyMode').classList.add('hidden');
         document.getElementById('runMode').classList.add('hidden');
         document.getElementById('kioskMode').classList.add('hidden');
+        document.getElementById('btnStandby').classList.remove('active');
         document.getElementById('btnRun').classList.remove('active');
         document.getElementById('btnKiosk').classList.remove('active');
 
-        if(mode === 'run') {
+        // 다른 모드로 갈 때 RFID 입력창 내용 지우기
+        document.getElementById('rfidInput').value = "";
+
+        if(mode === 'standby') {
+          document.getElementById('standbyMode').classList.remove('hidden');
+          document.getElementById('btnStandby').classList.add('active');
+          statusDiv.innerHTML = "대기 상태입니다.";
+          // 강제로 포커스를 해제하여 리더기가 읽어도 입력되지 않게 막음
+          document.activeElement.blur(); 
+        } else if(mode === 'run') {
           document.getElementById('runMode').classList.remove('hidden');
           document.getElementById('btnRun').classList.add('active');
-          document.getElementById('rfidInput').focus();
+          document.getElementById('rfidInput').focus(); // 다시 입력창 활성화
           statusDiv.innerHTML = "달리기 자동 측정 준비 완료";
-          statusDiv.style.color = "var(--text-main)";
         } else {
           document.getElementById('kioskMode').classList.remove('hidden');
           document.getElementById('btnKiosk').classList.add('active');
           statusDiv.innerHTML = "자율 기록 제출 준비 완료";
-          statusDiv.style.color = "var(--text-main)";
         }
+        resetIdleTimer();
       }
+
+      // 30초간 마우스/키보드 움직임이 없으면 '대기 모드'로 강제 전환
+      function resetIdleTimer() {
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(() => {
+          if(!document.getElementById('standbyMode').classList.contains('active')) {
+             switchTab('standby');
+             statusDiv.innerHTML = "⏱️ 시간 초과로 대기 모드로 전환되었습니다.";
+          }
+        }, 30000); // 30초 (필요시 60000 등 조절 가능)
+      }
+
+      // 화면 이벤트 감지 시 타이머 초기화
+      document.body.addEventListener('mousemove', resetIdleTimer);
+      document.body.addEventListener('keypress', resetIdleTimer);
+      document.body.addEventListener('click', resetIdleTimer);
 
       document.getElementById("rfidInput").addEventListener("keypress", async function(event) {
         if (event.key === "Enter") {
@@ -276,11 +167,9 @@
         var tagId = document.getElementById("kioskTag").value.trim();
         var exercise = document.getElementById("kioskExercise").value;
         var score = document.getElementById("kioskScore").value.trim();
-
         if(tagId === "" || score === "") { alert("태그 번호와 기록을 모두 입력해주세요!"); return; }
 
         statusDiv.innerHTML = "⏳ 기록 전송 중..."; 
-        statusDiv.style.color = "var(--text-sub)";
         document.getElementById("submitBtn").disabled = true;
 
         const resultMsg = await callGoogleScript('recordKioskExercise', [tagId, exercise, score]);
@@ -292,6 +181,8 @@
              statusDiv.style.color = "var(--primary-dark)";
              document.getElementById("kioskTag").value = "";
              document.getElementById("kioskScore").value = "";
+             // 수동 기록 제출 성공 후 대기모드로 전환
+             setTimeout(() => switchTab('standby'), 2000); 
           }
         }
         document.getElementById("submitBtn").disabled = false;
