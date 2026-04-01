@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>스마트 체육 키오스크</title>
     <style>
-      /* (CSS는 이전과 동일하게 유지 - 스크롤 압박을 줄이기 위해 생략 없이 넣습니다) */
       :root {
         --primary-color: #4CAF50; 
         --primary-dark: #388E3C;
@@ -21,16 +20,20 @@
       .header { background-color: var(--primary-color); color: white; padding: 20px 0; font-size: 24px; font-weight: bold; }
       .content-area { padding: 30px; }
       .tab-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
-      .tab-btn { flex: 1; padding: 15px 5px; font-size: 15px; cursor: pointer; border: 2px solid var(--border-color); border-radius: var(--radius); background-color: var(--card-bg); color: var(--text-sub); font-weight: bold; transition: all 0.3s ease; }
+      .tab-btn { flex: 1; padding: 15px 5px; font-size: 16px; cursor: pointer; border: 2px solid var(--border-color); border-radius: var(--radius); background-color: var(--card-bg); color: var(--text-sub); font-weight: bold; transition: all 0.3s ease; }
       .tab-btn.active { background-color: rgba(76, 175, 80, 0.1); border-color: var(--primary-color); color: var(--primary-color); }
       .input-group { margin-bottom: 20px; text-align: left; }
       .input-group label { display: block; font-size: 14px; color: var(--text-sub); margin-bottom: 8px; font-weight: bold; }
       input, select { width: 100%; font-size: 18px; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: #fafafa; }
       input:focus, select:focus { outline: none; border-color: var(--primary-color); background-color: #fff; }
+      
       button.submit-btn { width: 100%; font-size: 20px; font-weight: bold; padding: 16px; background-color: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; }
-      #status { margin-top: 25px; font-size: 20px; font-weight: bold; min-height: 30px; padding: 15px; border-radius: 8px; background-color: #f9f9f9; color: var(--text-main); }
+      button.batch-end-btn { width: 100%; font-size: 16px; font-weight: bold; padding: 12px; background-color: #E53935; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 15px; transition: 0.3s;}
+      button.batch-end-btn:hover { background-color: #C62828; }
+      
+      #status { margin-top: 25px; font-size: 18px; font-weight: bold; min-height: 30px; padding: 15px; border-radius: 8px; background-color: #f9f9f9; color: var(--text-main); word-break: keep-all;}
       .hidden { display: none !important; }
-      .desc-text { color: var(--text-sub); font-size: 15px; margin-bottom: 20px; }
+      .desc-text { color: var(--text-sub); font-size: 15px; margin-bottom: 10px; }
     </style>
   </head>
   <body>
@@ -39,28 +42,21 @@
       
       <div class="content-area">
         <div class="tab-container">
-          <button id="btnStandby" class="tab-btn active" onclick="switchTab('standby')">⏸️ 대기 (종료)</button>
-          <button id="btnRun" class="tab-btn" onclick="switchTab('run')">🏃 달리기 시작</button>
-          <button id="btnKiosk" class="tab-btn" onclick="switchTab('kiosk')">💪 자율 기록</button>
+          <button id="btnRun" class="tab-btn active" onclick="switchTab('run')">🏃 달리기 모드</button>
+          <button id="btnKiosk" class="tab-btn" onclick="switchTab('kiosk')">💪 타 종목 자율 기록</button>
         </div>
 
-        <div id="standbyMode">
-          <p class="desc-text" style="font-size: 18px; color: var(--primary-dark); font-weight: bold;">
-            현재 기록 측정이 중지된 대기 상태입니다.<br><br>
-            측정을 원하시면 위 메뉴를 선택해주세요.
-          </p>
-        </div>
-
-        <div id="runMode" class="hidden">
-          <p class="desc-text">리더기 앞을 지나가면 자동으로 기록됩니다.</p>
+        <div id="runMode">
+          <p class="desc-text">학생들이 통과하면 개별적으로 기록이 누적됩니다.<br>(※ 10분간 기록이 없으면 개별 자동 종료)</p>
           <div class="input-group">
-            <input type="text" id="rfidInput" placeholder="태그 자동 입력 대기중...">
+            <input type="text" id="rfidInput" placeholder="태그 스캔 대기중..." autofocus>
           </div>
+          <button class="batch-end-btn" onclick="endAllRunning()">🛑 전체 달리기 일괄 종료</button>
         </div>
 
         <div id="kioskMode" class="hidden">
-          <p class="desc-text">자신의 태그 번호와 기록을 직접 입력하세요.</p>
-          <div class="input-group"><label>태그 번호</label><input type="text" id="kioskTag" placeholder="본인 태그 번호 (예: TAG001)"></div>
+          <p class="desc-text" style="color:var(--primary-dark); font-weight:bold;">※ 이곳에 기록을 제출하면 해당 학생의 달리기는 자동 종료됩니다.</p>
+          <div class="input-group"><label>태그 번호</label><input type="text" id="kioskTag" placeholder="본인 태그 (예: TAG001)"></div>
           <div class="input-group"><label>운동 종목</label><select id="kioskExercise"><option>로딩 중...</option></select></div>
           <div class="input-group"><label>오늘의 기록</label><input type="number" id="kioskScore" placeholder="기록 (숫자만 입력)"></div>
           <button class="submit-btn" id="submitBtn" onclick="submitKiosk()">기록 제출하기</button>
@@ -71,9 +67,14 @@
     </div>
 
     <script>
+      // 🚨 [매우 중요] 선생님의 구글 앱스 스크립트 웹앱 주소(exec) 입력!
       const SCRIPT_URL = "여기에_선생님의_구글웹앱_EXEC_주소_입력";
+      
       var statusDiv = document.getElementById("status");
-      let idleTimer; // 30초 대기 타이머 변수
+
+      // 🧠 프론트엔드 상태 관리 엔진 (핵심)
+      let activeTags = {};      // 현재 달리고 있는 태그 { "TAG001": 마지막스캔시간(ms) }
+      let finishedTags = new Set(); // 완전히 종료된 태그 목록 (블랙리스트)
 
       async function callGoogleScript(actionName, argsArray = []) {
         try {
@@ -82,7 +83,8 @@
           if (!result.success) throw new Error(result.error);
           return result.data;
         } catch (error) {
-          statusDiv.innerHTML = "⚠️ 서버 통신 오류 발생"; statusDiv.style.color = "#E53935"; return null;
+          console.error(error);
+          return null;
         }
       }
 
@@ -95,63 +97,57 @@
             var option = document.createElement("option"); option.value = list[i]; option.text = list[i]; selectBox.appendChild(option);
           }
         }
-        resetIdleTimer(); // 초기 타이머 가동
       };
 
       function switchTab(mode) {
-        document.getElementById('standbyMode').classList.add('hidden');
         document.getElementById('runMode').classList.add('hidden');
         document.getElementById('kioskMode').classList.add('hidden');
-        document.getElementById('btnStandby').classList.remove('active');
         document.getElementById('btnRun').classList.remove('active');
         document.getElementById('btnKiosk').classList.remove('active');
 
-        // 다른 모드로 갈 때 RFID 입력창 내용 지우기
-        document.getElementById('rfidInput').value = "";
-
-        if(mode === 'standby') {
-          document.getElementById('standbyMode').classList.remove('hidden');
-          document.getElementById('btnStandby').classList.add('active');
-          statusDiv.innerHTML = "대기 상태입니다.";
-          // 강제로 포커스를 해제하여 리더기가 읽어도 입력되지 않게 막음
-          document.activeElement.blur(); 
-        } else if(mode === 'run') {
+        if(mode === 'run') {
           document.getElementById('runMode').classList.remove('hidden');
           document.getElementById('btnRun').classList.add('active');
-          document.getElementById('rfidInput').focus(); // 다시 입력창 활성화
-          statusDiv.innerHTML = "달리기 자동 측정 준비 완료";
+          document.getElementById('rfidInput').focus();
+          statusDiv.innerHTML = "🏃 달리기 측정 준비 완료 (다른 학생들은 계속 달릴 수 있습니다)";
         } else {
           document.getElementById('kioskMode').classList.remove('hidden');
           document.getElementById('btnKiosk').classList.add('active');
-          statusDiv.innerHTML = "자율 기록 제출 준비 완료";
+          statusDiv.innerHTML = "💪 자율 기록 제출 준비 완료";
         }
-        resetIdleTimer();
       }
 
-      // 30초간 마우스/키보드 움직임이 없으면 '대기 모드'로 강제 전환
-      function resetIdleTimer() {
-        clearTimeout(idleTimer);
-        idleTimer = setTimeout(() => {
-          if(!document.getElementById('standbyMode').classList.contains('active')) {
-             switchTab('standby');
-             statusDiv.innerHTML = "⏱️ 시간 초과로 대기 모드로 전환되었습니다.";
-          }
-        }, 30000); // 30초 (필요시 60000 등 조절 가능)
-      }
-
-      // 화면 이벤트 감지 시 타이머 초기화
-      document.body.addEventListener('mousemove', resetIdleTimer);
-      document.body.addEventListener('keypress', resetIdleTimer);
-      document.body.addEventListener('click', resetIdleTimer);
-
+      // [핵심] RFID 대량 스캔 처리 로직
       document.getElementById("rfidInput").addEventListener("keypress", async function(event) {
         if (event.key === "Enter") {
           event.preventDefault();
           var tagId = this.value.trim();
+          this.value = ""; // 스캔 즉시 입력창 비우기 (다음 사람을 위해)
+
           if(tagId === "") return;
           
-          this.value = ""; 
-          statusDiv.innerHTML = "⏳ 기록 전송 중..."; 
+          const now = Date.now();
+
+          // 1. 이미 종료 처리된 태그는 완전히 무시
+          if (finishedTags.has(tagId)) return;
+
+          // 2. 10분(600000ms) 이상 변화 없으면 개별 종료 처리
+          if (activeTags[tagId] && (now - activeTags[tagId] > 600000)) {
+            finishedTags.add(tagId);
+            delete activeTags[tagId];
+            statusDiv.innerHTML = `🛑 [${tagId}] 10분 경과로 달리기가 자동 종료되었습니다.`;
+            statusDiv.style.color = "#E53935";
+            return;
+          }
+
+          // 3. 10초(10000ms) 쿨타임 무시 (UHF 리더기 중복 스캔 완벽 방어)
+          if (activeTags[tagId] && (now - activeTags[tagId] < 10000)) {
+            return; // 10초 내 스캔은 아무 화면 변화 없이 조용히 무시
+          }
+
+          // --- 검증 통과 (구글 시트로 기록 전송) ---
+          activeTags[tagId] = now; // 마지막 스캔 시간 업데이트
+          statusDiv.innerHTML = "⏳ " + tagId + " 기록 업데이트 중..."; 
           statusDiv.style.color = "var(--text-sub)";
           
           const resultMsg = await callGoogleScript('recordRfidRun', [tagId]);
@@ -163,6 +159,7 @@
         }
       });
 
+      // 자율 기록 제출 (달리기 개별 종료 연동)
       async function submitKiosk() {
         var tagId = document.getElementById("kioskTag").value.trim();
         var exercise = document.getElementById("kioskExercise").value;
@@ -171,6 +168,10 @@
 
         statusDiv.innerHTML = "⏳ 기록 전송 중..."; 
         document.getElementById("submitBtn").disabled = true;
+
+        // 타 종목 입력 시, 해당 학생은 달리기를 끝낸 것으로 간주하고 달리기 종료 명단에 추가
+        finishedTags.add(tagId);
+        delete activeTags[tagId];
 
         const resultMsg = await callGoogleScript('recordKioskExercise', [tagId, exercise, score]);
         if(resultMsg) {
@@ -181,11 +182,26 @@
              statusDiv.style.color = "var(--primary-dark)";
              document.getElementById("kioskTag").value = "";
              document.getElementById("kioskScore").value = "";
-             // 수동 기록 제출 성공 후 대기모드로 전환
-             setTimeout(() => switchTab('standby'), 2000); 
+             
+             // 2초 뒤에 다시 달리기 측정 화면으로 자동 복귀 (다른 학생을 위해)
+             setTimeout(() => switchTab('run'), 2000); 
           }
         }
         document.getElementById("submitBtn").disabled = false;
+      }
+
+      // 일괄 종료 버튼
+      function endAllRunning() {
+        if(confirm("현재 진행 중인 모든 학생의 달리기를 종료하시겠습니까?\n(다음 반 수업을 시작하려면 화면을 새로고침 하세요.)")) {
+          // 달리고 있던 모든 태그를 종료 명단으로 이동
+          for(let tag in activeTags) {
+            finishedTags.add(tag);
+          }
+          activeTags = {}; // 활성 태그 초기화
+          statusDiv.innerHTML = "🛑 모든 달리기가 일괄 종료되었습니다. 이제 태그를 인식하지 않습니다.";
+          statusDiv.style.color = "#E53935";
+          document.getElementById('rfidInput').focus();
+        }
       }
     </script>
   </body>
