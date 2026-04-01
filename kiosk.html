@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>스마트 체육 키오스크</title>
+    <style>
+      body { font-family: 'Malgun Gothic', sans-serif; text-align: center; background-color: #f4f7f6; margin: 0; padding: 20px; }
+      .container { max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+      .tab-btn { padding: 12px 20px; font-size: 16px; margin: 5px; cursor: pointer; border: none; border-radius: 8px; background-color: #ddd; font-weight:bold;}
+      .tab-btn.active { background-color: #4CAF50; color: white; }
+      input, select { font-size: 20px; padding: 12px; margin: 10px 0; width: 80%; text-align: center; border: 2px solid #ccc; border-radius: 8px; }
+      button.submit-btn { font-size: 20px; padding: 12px 30px; background-color: #2196F3; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; width:85%;}
+      #status { margin-top: 20px; font-size: 22px; font-weight: bold; height: 40px; }
+      .hidden { display: none; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>🏆 스마트 체육 키오스크</h2>
+      
+      <div>
+        <button id="btnRun" class="tab-btn active" onclick="switchTab('run')">🏃 달리기 (자동)</button>
+        <button id="btnKiosk" class="tab-btn" onclick="switchTab('kiosk')">💪 자율 기록 (수동)</button>
+      </div>
+      <hr style="border-top:1px solid #eee; margin:20px 0;">
+
+      <div id="runMode">
+        <p style="color:gray; font-size:14px;">리더기 앞을 지나가면 자동 기록됩니다.</p>
+        <input type="text" id="rfidInput" placeholder="태그 자동 입력 대기중..." autofocus>
+      </div>
+
+      <div id="kioskMode" class="hidden">
+        <p style="color:gray; font-size:14px;">자신의 태그 번호와 기록을 입력하세요.</p>
+        <input type="text" id="kioskTag" placeholder="본인 태그 번호 (예: TAG001)">
+        <select id="kioskExercise"><option>로딩 중...</option></select>
+        <input type="number" id="kioskScore" placeholder="기록 (숫자만 입력)">
+        <br>
+        <button class="submit-btn" id="submitBtn" onclick="submitKiosk()">기록 제출하기</button>
+      </div>
+
+      <div id="status">대기 중...</div>
+    </div>
+
+    <script>
+      // 🚨 [매우 중요] 아래 따옴표 안에 선생님의 구글 앱스 스크립트 웹앱 주소(exec)를 넣으세요!
+      const SCRIPT_URL = "여기에_선생님의_구글웹앱_EXEC_주소_입력";
+
+      var statusDiv = document.getElementById("status");
+
+      // 구글 서버와 통신하는 공통 함수 (Vercel 연동용)
+      async function callGoogleScript(actionName, argsArray = []) {
+        try {
+          const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({ action: actionName, args: argsArray })
+          });
+          const result = await response.json();
+          if (!result.success) throw new Error(result.error);
+          return result.data;
+        } catch (error) {
+          statusDiv.innerHTML = "⚠️ 서버 통신 오류 발생";
+          statusDiv.style.color = "#E53935";
+          console.error(error);
+          return null;
+        }
+      }
+
+      window.onload = async function() {
+        // 구글 시트 '설정' 탭에서 종목 리스트 불러오기
+        const list = await callGoogleScript('getKioskExerciseList');
+        if (list) {
+          var selectBox = document.getElementById("kioskExercise");
+          selectBox.innerHTML = "";
+          for(var i = 0; i < list.length; i++) {
+            var option = document.createElement("option");
+            option.value = list[i]; option.text = list[i];
+            selectBox.appendChild(option);
+          }
+        }
+      };
+
+      function switchTab(mode) {
+        document.getElementById('runMode').classList.add('hidden');
+        document.getElementById('kioskMode').classList.add('hidden');
+        document.getElementById('btnRun').classList.remove('active');
+        document.getElementById('btnKiosk').classList.remove('active');
+
+        if(mode === 'run') {
+          document.getElementById('runMode').classList.remove('hidden');
+          document.getElementById('btnRun').classList.add('active');
+          document.getElementById('rfidInput').focus();
+          statusDiv.innerHTML = "달리기 자동 측정 준비";
+        } else {
+          document.getElementById('kioskMode').classList.remove('hidden');
+          document.getElementById('btnKiosk').classList.add('active');
+          statusDiv.innerHTML = "자율 기록 제출 준비";
+        }
+      }
+
+      document.getElementById("rfidInput").addEventListener("keypress", async function(event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          var tagId = this.value.trim();
+          if(tagId === "") return;
+          
+          this.value = ""; 
+          statusDiv.innerHTML = "⏳ 기록 중..."; statusDiv.style.color = "gray";
+          
+          const resultMsg = await callGoogleScript('recordRfidRun', [tagId]);
+          if(resultMsg) {
+            statusDiv.innerHTML = resultMsg;
+            if(resultMsg.includes("⚠️")) statusDiv.style.color = "#E53935";
+            else statusDiv.style.color = "#43A047";
+          }
+        }
+      });
+
+      async function submitKiosk() {
+        var tagId = document.getElementById("kioskTag").value.trim();
+        var exercise = document.getElementById("kioskExercise").value;
+        var score = document.getElementById("kioskScore").value.trim();
+
+        if(tagId === "" || score === "") { alert("태그 번호와 기록을 모두 입력해주세요!"); return; }
+
+        statusDiv.innerHTML = "⏳ 기록 전송 중..."; statusDiv.style.color = "gray";
+        document.getElementById("submitBtn").disabled = true; // 중복 클릭 방지
+
+        const resultMsg = await callGoogleScript('recordKioskExercise', [tagId, exercise, score]);
+        if(resultMsg) {
+          statusDiv.innerHTML = resultMsg;
+          if(resultMsg.includes("⚠️")) {
+             statusDiv.style.color = "#E53935";
+          } else {
+             statusDiv.style.color = "#1E88E5";
+             document.getElementById("kioskTag").value = "";
+             document.getElementById("kioskScore").value = "";
+          }
+        }
+        document.getElementById("submitBtn").disabled = false;
+      }
+    </script>
+  </body>
+</html>
