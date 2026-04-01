@@ -3,64 +3,153 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>스마트 체육 키오스크 - 범용 플랫폼</title>
+    <title>스마트 체육 키오스크</title>
     <style>
       :root {
-        --primary-color: #4CAF50; --primary-dark: #388E3C;
-        --blue-team: #1E88E5; --red-team: #E53935;
-        --bg-color: #f4f7f6; --card-bg: #ffffff;
-        --text-main: #333333; --text-sub: #777777; --border-color: #e0e0e0;
-        --radius: 12px;
+        /* 모던하고 부드러운 컬러 팔레트 */
+        --primary-color: #4F46E5;    /* 세련된 인디고 블루 */
+        --primary-hover: #4338CA;
+        --danger-color: #E11D48;     /* 부드러운 로즈 레드 */
+        --danger-hover: #BE123C;
+        --blue-team: #3B82F6; 
+        --red-team: #EF4444;
+        
+        --bg-color: #F3F4F6;         /* 밝은 회색 배경 */
+        --card-bg: #FFFFFF;
+        --text-main: #111827;        /* 완전 검은색이 아닌 다크 그레이 */
+        --text-sub: #6B7280;
+        --border-color: #E5E7EB;
+        --input-bg: #F9FAFB;
+        
+        --radius: 16px;              /* 더 둥글고 부드러운 모서리 */
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
       }
-      body { font-family: 'Pretendard', 'Malgun Gothic', sans-serif; background-color: var(--bg-color); margin: 0; padding: 15px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; }
-      .container { width: 100%; max-width: 650px; background: var(--card-bg); border-radius: var(--radius); box-shadow: 0 8px 20px rgba(0,0,0,0.08); overflow: hidden; text-align: center; position: relative;}
-      .header { background-color: var(--primary-color); color: white; padding: 20px 0; font-size: 24px; font-weight: bold; }
-      .content-area { padding: 25px; }
       
-      /* 메인 탭 */
-      .tab-container { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
-      .tab-btn { flex: 1; padding: 12px 2px; font-size: 16px; cursor: pointer; border: 2px solid var(--border-color); border-radius: 8px; background-color: var(--card-bg); color: var(--text-sub); font-weight: bold; transition: 0.3s; }
-      .tab-btn.active { background-color: rgba(76, 175, 80, 0.1); border-color: var(--primary-color); color: var(--primary-color); }
+      body { 
+        font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; 
+        background-color: var(--bg-color); 
+        color: var(--text-main);
+        margin: 0; padding: 20px; 
+        display: flex; justify-content: center; align-items: center; 
+        min-height: 100vh; box-sizing: border-box; 
+      }
+      
+      .container { 
+        width: 100%; max-width: 650px; 
+        background: var(--card-bg); 
+        border-radius: var(--radius); 
+        box-shadow: var(--shadow); 
+        overflow: hidden; text-align: center; position: relative;
+      }
+      
+      /* 헤더 디자인: 배경색 없이 깔끔한 텍스트와 하단 선 */
+      .header { 
+        background-color: var(--card-bg); 
+        color: var(--text-main); 
+        padding: 24px 0 20px; 
+        font-size: 22px; font-weight: 700; 
+        border-bottom: 1px solid var(--border-color);
+        letter-spacing: -0.5px;
+      }
+      
+      .content-area { padding: 30px 25px; }
+      
+      /* 메인 탭: 세그먼트 컨트롤 스타일 (테두리 깎고 부드럽게) */
+      .tab-container { 
+        display: flex; 
+        background-color: var(--input-bg);
+        padding: 6px; 
+        border-radius: 12px; 
+        margin-bottom: 25px; 
+      }
+      .tab-btn { 
+        flex: 1; padding: 12px 0; 
+        font-size: 15px; cursor: pointer; 
+        border: none; border-radius: 8px; 
+        background-color: transparent; 
+        color: var(--text-sub); font-weight: 600; 
+        transition: all 0.2s ease; 
+      }
+      .tab-btn.active { 
+        background-color: var(--card-bg); 
+        color: var(--text-main); 
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+      }
       
       /* 공통 요소 */
-      .input-group { margin-bottom: 15px; text-align: left; }
-      .input-group label { display: block; font-size: 14px; color: var(--text-sub); margin-bottom: 6px; font-weight: bold; }
-      input, select { width: 100%; font-size: 16px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; text-align: center; font-weight:bold; }
+      .input-group { margin-bottom: 20px; text-align: left; }
+      .input-group label { display: block; font-size: 14px; color: var(--text-sub); margin-bottom: 8px; font-weight: 600; }
+      input, select { 
+        width: 100%; font-size: 15px; padding: 14px; 
+        border: 1px solid var(--border-color); border-radius: 10px; 
+        box-sizing: border-box; text-align: left; 
+        background-color: var(--card-bg); color: var(--text-main);
+        transition: border-color 0.2s;
+        font-family: inherit;
+      }
+      input:focus, select:focus { outline: none; border-color: var(--primary-color); }
       
-      .controls-row { display: flex; gap: 10px; margin-bottom: 15px; }
-      .btn-start { flex: 1; background-color: var(--primary-color); color: white; padding: 12px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; }
-      .btn-stop { flex: 1; background-color: #E53935; color: white; padding: 12px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; }
-      .btn-info { background-color: #0288D1; color: white; border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; }
+      /* 시작/종료 버튼 스타일 (이모지 제거, 모던 텍스트) */
+      .controls-row { display: flex; gap: 12px; margin-bottom: 20px; }
+      .btn-start { 
+        flex: 1; background-color: var(--primary-color); color: white; 
+        padding: 14px; font-size: 15px; font-weight: 600; 
+        border: none; border-radius: 10px; cursor: pointer; transition: 0.2s;
+      }
+      .btn-start:hover { background-color: var(--primary-hover); }
+      
+      .btn-stop { 
+        flex: 1; background-color: var(--danger-color); color: white; 
+        padding: 14px; font-size: 15px; font-weight: 600; 
+        border: none; border-radius: 10px; cursor: pointer; transition: 0.2s;
+      }
+      .btn-stop:hover { background-color: var(--danger-hover); }
+      
+      .btn-info { 
+        background-color: var(--input-bg); color: var(--text-sub); 
+        border: 1px solid var(--border-color); border-radius: 6px; 
+        padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s;
+      }
+      .btn-info:hover { background-color: var(--border-color); color: var(--text-main); }
 
-      #status { margin-top: 20px; font-size: 17px; font-weight: bold; padding: 12px; border-radius: 8px; background-color: #f9f9f9; min-height: 24px;}
+      #status { 
+        margin-top: 25px; font-size: 15px; font-weight: 500; 
+        padding: 16px; border-radius: 10px; 
+        background-color: var(--input-bg); color: var(--text-main); 
+        min-height: 24px; border: 1px solid var(--border-color);
+      }
       .hidden { display: none !important; }
 
-      /* --- 게임 UI 특화 --- */
-      /* 1. 팀 대항전 */
-      .scoreboard { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-      .team-box { width: 45%; border-radius: 12px; padding: 15px 0; color: white; }
+      /* --- 게임 UI 특화 (색상 톤다운) --- */
+      .scoreboard { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; gap: 12px; }
+      .team-box { flex: 1; border-radius: 12px; padding: 20px 0; color: white; }
       .team-blue { background-color: var(--blue-team); }
       .team-red { background-color: var(--red-team); }
-      .team-score { font-size: 45px; font-weight: 900; }
+      .team-score { font-size: 36px; font-weight: 800; margin-top: 5px;}
 
-      /* 4. 릴레이 전용 */
-      .lap-list { background: #f0f4f8; border-radius: 10px; padding: 10px; max-height: 200px; overflow-y: auto; text-align: left; }
-      .lap-item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #ddd; font-family: monospace; font-weight: bold;}
+      .lap-list { background: var(--input-bg); border-radius: 10px; padding: 15px; max-height: 200px; overflow-y: auto; text-align: left; }
+      .lap-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color); font-family: monospace; font-size: 15px; color: var(--text-main);}
+      .lap-item:last-child { border-bottom: none; }
 
-      /* 5. 협동전 전용 (게이지) */
-      .coop-container { margin: 20px 0; }
-      .progress-bg { background: #eee; border-radius: 20px; height: 40px; width: 100%; overflow: hidden; position: relative; border: 2px solid #ddd;}
-      .progress-fill { background: linear-gradient(90deg, #FFD700, #4CAF50); height: 100%; width: 0%; transition: width 0.5s ease-out; }
-      .progress-text { position: absolute; width: 100%; top: 50%; left: 0; transform: translateY(-50%); font-weight: 900; color: #333; }
+      .coop-container { margin: 25px 0; }
+      .progress-bg { background: var(--input-bg); border-radius: 20px; height: 36px; width: 100%; overflow: hidden; position: relative; border: 1px solid var(--border-color);}
+      .progress-fill { background: var(--primary-color); height: 100%; width: 0%; transition: width 0.5s ease-out; }
+      .progress-text { position: absolute; width: 100%; top: 50%; left: 0; transform: translateY(-50%); font-weight: 600; font-size: 14px; color: var(--text-main); mix-blend-mode: difference; color: white;}
 
-      /* 공통 랭킹 리스트 */
-      .ranking-area { background: #fff; border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; max-height: 200px; overflow-y: auto; text-align: left; margin-top:10px;}
-      .rank-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;}
-      .rank-1 { color: #B8860B; background: #fffdf0; }
+      .ranking-area { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 5px 15px; max-height: 200px; overflow-y: auto; text-align: left; margin-top:15px;}
+      .rank-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color); font-weight: 500; font-size: 15px;}
+      .rank-item:last-child { border-bottom: none; }
+      .rank-1 { color: var(--primary-color); font-weight: 700; }
 
-      /* 모달 */
-      .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 100; }
-      .modal-content { background: white; padding: 20px; border-radius: 12px; width: 85%; max-width: 400px; text-align: left; }
+      /* 모달 (그림자 및 테두리 정제) */
+      .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.4); backdrop-filter: blur(2px); display: flex; justify-content: center; align-items: center; z-index: 100; border-radius: var(--radius); }
+      .modal-content { background: var(--card-bg); padding: 25px; border-radius: 16px; width: 85%; max-width: 400px; text-align: left; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+      .modal-title { font-size: 18px; font-weight: 700; margin-top: 0; color: var(--text-main); margin-bottom: 10px;}
+      .modal-body { font-size: 14px; line-height: 1.6; color: var(--text-sub); margin-bottom: 20px; word-break: keep-all; }
+      .btn-close-modal { width: 100%; padding: 12px; background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+      .btn-close-modal:hover { background: #E5E7EB; }
+      
+      .timer-display { font-size: 40px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-weight: 700; color: var(--text-main); letter-spacing: -1px; margin: 20px 0;}
     </style>
   </head>
   <body>
@@ -68,22 +157,22 @@
       
       <div id="infoModal" class="modal-overlay hidden">
         <div class="modal-content">
-          <h3 id="modalTitle" style="margin-top:0; color:var(--primary-dark);"></h3>
-          <div id="modalBody" style="font-size:15px; line-height:1.6; margin-bottom:20px;"></div>
-          <button style="width:100%; padding:12px; background:#555; color:white; border:none; border-radius:8px; cursor:pointer;" onclick="closeModal()">확인</button>
+          <h3 id="modalTitle" class="modal-title"></h3>
+          <div id="modalBody" class="modal-body"></div>
+          <button class="btn-close-modal" onclick="closeModal()">확인</button>
         </div>
       </div>
 
-      <div class="header">🏆 스마트 체육 키오스크</div>
+      <div class="header">스마트 체육 키오스크</div>
       
       <div class="content-area">
         <div class="tab-container">
-          <button id="btnBasic" class="tab-btn active" onclick="switchMainTab('basic')">🏃 측정 및 기록</button>
-          <button id="btnGame" class="tab-btn" onclick="switchMainTab('game')">🎮 게임 모드</button>
+          <button id="btnBasic" class="tab-btn active" onclick="switchMainTab('basic')">측정 및 기록</button>
+          <button id="btnGame" class="tab-btn" onclick="switchMainTab('game')">게임 모드</button>
         </div>
 
         <div id="globalInputArea" class="input-group">
-          <input type="text" id="globalRfidInput" placeholder="[리더기 스캔 대기]">
+          <input type="text" id="globalRfidInput" placeholder="리더기 스캔 대기 중" style="text-align: center; background-color: #EEF2FF; border-color: #C7D2FE; color: #4338CA;">
         </div>
 
         <div id="basicModeArea">
@@ -91,31 +180,34 @@
             <label>측정 항목 선택</label>
             <select id="basicSelect" onchange="changeBasicUI()">
               <option value="basic1">1. 달리기 (바퀴 수 누적)</option>
-              <option value="basic2">2. 달리기 (초정밀 결승선 타이머)</option>
+              <option value="basic2">2. 달리기 (결승선 타이머)</option>
               <option value="basic3">3. 자율 운동 기록 (수동 제출)</option>
             </select>
           </div>
           <div id="basic1UI">
-            <button class="btn-stop" style="width:100%" onclick="endActivity('basic1')">🛑 측정 일괄 종료</button>
+            <button class="btn-stop" style="width:100%" onclick="endActivity('basic1')">측정 일괄 종료</button>
           </div>
           <div id="basic2UI" class="hidden">
-            <div class="controls-row"><button class="btn-start" onclick="startBasic2()">▶️ 타이머 시작</button><button class="btn-stop" onclick="endActivity('basic2')">⏹️ 초기화</button></div>
-            <div id="basic2Timer" style="font-size:40px; font-family:monospace; font-weight:bold; color:var(--primary-dark);">00:00.00</div>
+            <div class="controls-row">
+              <button class="btn-start" onclick="startBasic2()">타이머 시작</button>
+              <button class="btn-stop" onclick="endActivity('basic2')">초기화</button>
+            </div>
+            <div id="basic2Timer" class="timer-display">00:00.00</div>
             <div class="ranking-area" id="basic2Ranking"></div>
           </div>
           <div id="basic3UI" class="hidden">
-            <div class="input-group"><input type="text" id="kioskTag" placeholder="본인 태그"></div>
-            <div class="input-group"><select id="kioskExercise"></select></div>
-            <div class="input-group"><input type="number" id="kioskScore" placeholder="오늘의 기록(숫자)"></div>
+            <div class="input-group"><label>학생 태그</label><input type="text" id="kioskTag" placeholder="본인 태그 입력"></div>
+            <div class="input-group"><label>운동 종목</label><select id="kioskExercise"></select></div>
+            <div class="input-group"><label>기록</label><input type="number" id="kioskScore" placeholder="기록 입력 (숫자)"></div>
             <button class="btn-start" style="width:100%" onclick="submitKiosk()">기록 제출하기</button>
           </div>
         </div>
 
         <div id="gameModeArea" class="hidden">
           <div class="input-group">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
               <label style="margin:0;">범용 게임 선택</label>
-              <button class="btn-info" onclick="openInfoModal()">ℹ️ 설명</button>
+              <button class="btn-info" onclick="openInfoModal()">안내</button>
             </div>
             <select id="gameSelect" onchange="changeGameUI()">
               <option value="game1">1. [팀 대항전] 진지 점령 (팀 스택 누적)</option>
@@ -125,28 +217,33 @@
               <option value="game5">5. [학급 협동전] 에너지 모으기 (전체 합계)</option>
             </select>
           </div>
-          <div class="controls-row"><button class="btn-start" onclick="startGame()">▶️ 게임 시작</button><button class="btn-stop" onclick="endActivity('game')">⏹️ 활동 종료</button></div>
+          <div class="controls-row">
+            <button class="btn-start" onclick="startGame()">게임 시작</button>
+            <button class="btn-stop" onclick="endActivity('game')">활동 종료</button>
+          </div>
 
           <div id="game1UI" class="hidden">
             <div class="scoreboard">
-              <div class="team-box team-blue"><div>청팀</div><div class="team-score" id="scoreBlue">0</div></div>
-              <div class="team-box team-red"><div>백팀</div><div class="team-score" id="scoreRed">0</div></div>
+              <div class="team-box team-blue"><div style="font-size:15px; font-weight:600; opacity:0.9;">청팀</div><div class="team-score" id="scoreBlue">0</div></div>
+              <div class="team-box team-red"><div style="font-size:15px; font-weight:600; opacity:0.9;">백팀</div><div class="team-score" id="scoreRed">0</div></div>
             </div>
           </div>
           <div id="game2UI" class="hidden">
-            <div id="survivorList" class="ranking-area" style="height:120px;"></div>
-            <div id="zombieList" class="ranking-area" style="height:80px; background:#fff1f1;"></div>
+            <div id="survivorList" class="ranking-area" style="height:120px; border-color:#86EFAC;"></div>
+            <div id="zombieList" class="ranking-area" style="height:80px; background:#FEF2F2; border-color:#FECACA; color:#991B1B;"></div>
           </div>
           <div id="game3UI" class="hidden"><div id="rankingList" class="ranking-area"></div></div>
           
           <div id="game4UI" class="hidden">
-             <div id="game4Timer" style="font-size:30px; font-family:monospace; margin-bottom:10px;">누적: 00:00.00</div>
+             <div id="game4Timer" class="timer-display" style="font-size:32px; margin-bottom:15px;">00:00.00</div>
              <div id="lapList" class="lap-list"></div>
           </div>
           
           <div id="game5UI" class="hidden">
             <div class="coop-container">
-              <label>목표 점수: <input type="number" id="coopTarget" value="100" style="width:60px; padding:2px; font-size:14px;"> 찍기</label>
+              <label style="display:block; text-align:left; font-size:14px; color:var(--text-sub); margin-bottom:8px; font-weight:600;">
+                목표 횟수: <input type="number" id="coopTarget" value="100" style="width:80px; padding:6px; font-size:14px; display:inline-block; margin-left:8px;">
+              </label>
               <div class="progress-bg"><div id="progressFill" class="progress-fill"></div><div id="progressText" class="progress-text">0 / 100</div></div>
             </div>
           </div>
@@ -161,7 +258,6 @@
       var statusDiv = document.getElementById("status");
       let currentMainTab = "basic", currentBasic = "basic1", currentGame = "game1";
       
-      // 상태 데이터
       let activeTags = {}, finishedTags = new Set();
       let isBasic2Running = false, basic2StartTime = 0, basic2Results = [], basic2Finished = new Set(), basic2Interval;
       let isGameRunning = false, game1TeamMap = {}, game1Cooldowns = {}, scoreBlue = 0, scoreRed = 0;
@@ -171,11 +267,11 @@
       let game5Total = 0;
 
       const gameInfoData = {
-        "game1": { title: "🔵🔴 [팀 대항전] 진지 점령", desc: "찍는 순서대로 청/백팀 자동 배정!<br>제한 시간 동안 리더기를 더 많이 찍은 팀이 승리합니다.<br>(5초 중복 방지 적용)" },
-        "game2": { title: "🧟 [생존/인터벌] 좀비 생존", desc: "태그 시 3분의 생존 시간이 부여됩니다.<br>시간이 다 되기 전 다시 찍어 리셋하지 못하면 좀비가 됩니다!" },
-        "game3": { title: "🏃 [개인 누적전] 미션 랭킹", desc: "개인별로 찍은 횟수를 실시간 랭킹으로 보여줍니다.<br>미션 수행 후 인증하는 용도로 최적입니다.<br>(10초 중복 방지)" },
-        "game4": { title: "⏱️ [릴레이전] 랩타임 측정", desc: "RFID 태그를 바톤처럼 사용하세요!<br>찍을 때마다 주자별 소요 시간과 전체 누적 시간이 기록됩니다." },
-        "game5": { title: "🤝 [학급 협동전] 에너지 모으기", desc: "우리 반 전체가 힘을 합쳐 목표 점수를 채우는 모드입니다.<br>경쟁 대신 협동이 필요한 수업에 사용하세요." }
+        "game1": { title: "[팀 대항전] 진지 점령", desc: "태그를 찍는 순서대로 청/백팀에 자동 배정됩니다. 제한 시간 동안 리더기를 더 많이 찍은 팀이 승리합니다. (5초 중복 방지 적용)" },
+        "game2": { title: "[생존/인터벌] 좀비 생존", desc: "태그 시 3분의 생존 시간이 부여됩니다. 시간이 다 되기 전 다시 찍어 리셋하지 못하면 좀비가 됩니다." },
+        "game3": { title: "[개인 누적전] 미션 랭킹", desc: "개인별로 찍은 횟수를 실시간 랭킹으로 보여줍니다. 미션 수행 후 인증하는 용도로 최적입니다. (10초 중복 방지)" },
+        "game4": { title: "[릴레이전] 랩타임 측정", desc: "RFID 태그를 바톤처럼 사용하세요. 찍을 때마다 주자별 소요 시간과 전체 누적 시간이 기록됩니다." },
+        "game5": { title: "[학급 협동전] 에너지 모으기", desc: "우리 반 전체가 힘을 합쳐 목표 점수를 채우는 모드입니다. 경쟁 대신 협동이 필요한 수업에 사용하세요." }
       };
 
       async function callGoogleScript(a, args = []) {
@@ -226,7 +322,6 @@
       }
       function closeModal() { document.getElementById('infoModal').classList.add('hidden'); document.getElementById('globalRfidInput').focus(); }
 
-      // 게임 로직 시작
       function startGame() {
         isGameRunning = true; document.getElementById('globalRfidInput').focus();
         if(currentGame === "game1") { scoreBlue = 0; scoreRed = 0; game1TeamMap = {}; updateGame1UI(); }
@@ -244,12 +339,11 @@
           game4StartTime = Date.now(); game4Laps = [];
           clearInterval(game4Interval);
           game4Interval = setInterval(() => {
-            let t = Date.now() - game4StartTime;
-            document.getElementById('game4Timer').innerText = "누적: " + formatTime(t);
+            document.getElementById('game4Timer').innerText = formatTime(Date.now() - game4StartTime);
           }, 50);
         }
         else if(currentGame === "game5") { game5Total = 0; updateGame5UI(); }
-        statusDiv.innerHTML = "🏁 게임이 시작되었습니다!";
+        statusDiv.innerHTML = "게임이 시작되었습니다.";
       }
 
       function startBasic2() {
@@ -258,13 +352,14 @@
         basic2Interval = setInterval(() => {
           document.getElementById('basic2Timer').innerText = formatTime(Date.now() - basic2StartTime);
         }, 50);
+        statusDiv.innerHTML = "타이머가 시작되었습니다.";
       }
 
       function endActivity(type) {
-        if(!confirm("초기화하시겠습니까?")) return;
+        if(!confirm("진행 중인 데이터를 초기화하시겠습니까?")) return;
         if(type==='basic2') { isBasic2Running = false; clearInterval(basic2Interval); }
         else if(type==='game') { isGameRunning = false; clearInterval(game2Interval); clearInterval(game4Interval); }
-        statusDiv.innerHTML = "🛑 종료되었습니다.";
+        statusDiv.innerHTML = "활동이 종료되었습니다.";
       }
 
       function formatTime(t) {
@@ -272,7 +367,6 @@
         return `${m}:${s}.${ms}`;
       }
 
-      // RFID 입력 핵심 처리
       document.getElementById("globalRfidInput").addEventListener("keypress", async function(e) {
         if (e.key === "Enter") {
           let tagId = this.value.trim(); this.value = ""; if(!tagId) return;
@@ -315,11 +409,10 @@
         }
       });
 
-      // UI 갱신 함수들
       function updateBasic2UI() {
         let r = document.getElementById("basic2Ranking");
         basic2Results.sort((a,b)=>a.time-b.time);
-        r.innerHTML = basic2Results.map((i,idx)=>`<div class="rank-item"><span>${idx+1}등 - ${i.tag}</span><span>${formatTime(i.time)}</span></div>`).join('');
+        r.innerHTML = basic2Results.map((i,idx)=>`<div class="rank-item"><span class="${idx===0?'rank-1':''}">${idx+1}위 - ${i.tag}</span><span>${formatTime(i.time)}</span></div>`).join('');
       }
       function updateGame1UI() {
         document.getElementById('scoreBlue').innerText = scoreBlue; document.getElementById('scoreRed').innerText = scoreRed;
@@ -328,23 +421,23 @@
         const now = Date.now();
         document.getElementById('survivorList').innerHTML = Object.entries(game2Survivors).map(([t,v])=>{
           let left = Math.ceil((v-now)/1000);
-          return `<span style="padding:5px; border-radius:5px; background:#e8f5e9; margin:3px; display:inline-block;">${t} (${left}s)</span>`;
+          return `<span style="padding:4px 8px; border-radius:6px; background:#DCFCE7; color:#166534; font-size:13px; margin:3px; display:inline-block; font-weight:600;">${t} (${left}s)</span>`;
         }).join('');
-        document.getElementById('zombieList').innerHTML = "🧟 좀비: " + Array.from(game2Zombies).join(', ');
+        document.getElementById('zombieList').innerHTML = "<div style='padding:10px; font-weight:600;'>감염자: " + Array.from(game2Zombies).join(', ') + "</div>";
       }
       function updateGame3UI() {
         let sorted = Object.entries(game3Scores).sort((a,b)=>b[1]-a[1]);
-        document.getElementById('rankingList').innerHTML = sorted.map((i,idx)=>`<div class="rank-item ${idx===0?'rank-1':''}"><span>${idx+1}등 - ${i[0]}</span><span>${i[1]} 스택</span></div>`).join('');
+        document.getElementById('rankingList').innerHTML = sorted.map((i,idx)=>`<div class="rank-item"><span>${idx===0?'<strong style="color:var(--primary-color)">1위</strong>':idx+1+'위'} - ${i[0]}</span><span style="color:var(--text-sub);">${i[1]} 스택</span></div>`).join('');
       }
       function updateGame4UI() {
-        document.getElementById('lapList').innerHTML = game4Laps.slice().reverse().map((i,idx)=>`<div class="lap-item"><span>${game4Laps.length-idx}번 주자(${i.tag})</span><span>+${formatTime(i.lap)}</span></div>`).join('');
+        document.getElementById('lapList').innerHTML = game4Laps.slice().reverse().map((i,idx)=>`<div class="lap-item"><span>주자 ${game4Laps.length-idx} (${i.tag})</span><span style="color:var(--text-sub)">+${formatTime(i.lap)}</span></div>`).join('');
       }
       function updateGame5UI() {
         let target = parseInt(document.getElementById('coopTarget').value) || 100;
         let percent = Math.min(100, (game5Total / target) * 100);
         document.getElementById('progressFill').style.width = percent + "%";
         document.getElementById('progressText').innerText = `${game5Total} / ${target}`;
-        if(game5Total >= target) { statusDiv.innerHTML = "🎊 축하합니다! 목표 에너지를 모두 모았습니다! 🎊"; statusDiv.style.color="orange"; }
+        if(game5Total >= target) { statusDiv.innerHTML = "목표 에너지를 모두 모았습니다."; }
       }
       async function submitKiosk() {
         let t = document.getElementById('kioskTag').value, e = document.getElementById('kioskExercise').value, s = document.getElementById('kioskScore').value;
